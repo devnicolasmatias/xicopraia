@@ -190,7 +190,7 @@ export default function MesasClient({ tables, userRole }: Props) {
                   <button
                     onClick={() => handleStatusChange(table.id, "LIVRE")}
                     disabled={isPending}
-                    className="w-full px-3 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-100"
+                    className="w-full px-3 py-2.5 text-sm text-left text-orange-600 hover:bg-orange-50 flex items-center gap-2 border-t border-gray-100"
                   >
                     <LogOut size={14} /> Liberar mesa
                   </button>
@@ -213,7 +213,7 @@ export default function MesasClient({ tables, userRole }: Props) {
         <div className="flex flex-wrap gap-4 text-xs text-gray-500">
           {[
             { color: "bg-green-500",  label: "Livre" },
-            { color: "bg-red-500",    label: "Ocupada" },
+            { color: "bg-orange-500",    label: "Ocupada" },
             { color: "bg-yellow-500", label: "Pediu a conta" },
             { color: "bg-blue-500",   label: "Reservada" },
             { color: "bg-gray-400",   label: "Aguardando limpeza" },

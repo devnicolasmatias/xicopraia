@@ -386,7 +386,7 @@ export default function SalesClient({
                   </div>
                   <button
                     onClick={() => { setCustomer(null); setUsesCashback(false); }}
-                    className="text-gray-400 hover:text-red-500 ml-1"
+                    className="text-gray-400 hover:text-orange-500 ml-1"
                   >
                     <X size={15} />
                   </button>
@@ -412,7 +412,7 @@ export default function SalesClient({
         )}
 
         {errorMessage && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
+          <div className="bg-orange-50 border border-orange-200 text-orange-700 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
             <AlertCircle size={16} className="shrink-0" />
             {errorMessage}
           </div>
@@ -458,11 +458,11 @@ export default function SalesClient({
 
             {nfceState.status === "error" && (
               <div className="space-y-2">
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-1.5">
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 space-y-1.5">
                   {nfceState.cStat && (
-                    <p className="text-xs font-mono font-semibold text-red-500">cStat {nfceState.cStat}</p>
+                    <p className="text-xs font-mono font-semibold text-orange-500">cStat {nfceState.cStat}</p>
                   )}
-                  <p className="text-sm text-red-700 break-all whitespace-pre-wrap">{nfceState.msg}</p>
+                  <p className="text-sm text-orange-700 break-all whitespace-pre-wrap">{nfceState.msg}</p>
                 </div>
                 <button
                   onClick={handleEmitirNfce}
@@ -613,7 +613,7 @@ export default function SalesClient({
                       <button
                         type="button"
                         onClick={() => removeFromCart(index)}
-                        className="text-gray-400 hover:text-red-500 transition shrink-0"
+                        className="text-gray-400 hover:text-orange-500 transition shrink-0"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -677,7 +677,7 @@ export default function SalesClient({
                       className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                     {cashPaid > 0 && cashPaid < total && (
-                      <p className="text-xs text-red-500 mt-1">Valor insuficiente</p>
+                      <p className="text-xs text-orange-500 mt-1">Valor insuficiente</p>
                     )}
                   </div>
                 )}

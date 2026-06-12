@@ -160,7 +160,7 @@ export default function FiscalConfigClient({ config, defaultSerie = 1 }: Props) 
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg border
-          ${toast.type === "error" ? "bg-red-50 border-red-200 text-red-600" : "bg-green-50 border-green-200 text-green-700"}`}
+          ${toast.type === "error" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-green-50 border-green-200 text-green-700"}`}
         >
           {toast.type === "success" ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
           {toast.msg}
@@ -482,7 +482,7 @@ export default function FiscalConfigClient({ config, defaultSerie = 1 }: Props) 
                     <p className="text-xs text-gray-500 mt-1">
                       Válido até: {new Date(certInfo.validTo).toLocaleDateString("pt-BR")}
                       {new Date(certInfo.validTo) < new Date() && (
-                        <span className="ml-2 text-red-600 font-medium">EXPIRADO</span>
+                        <span className="ml-2 text-orange-600 font-medium">EXPIRADO</span>
                       )}
                     </p>
                   )}

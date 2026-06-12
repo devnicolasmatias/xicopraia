@@ -15,7 +15,7 @@ const STATUS_STYLE: Record<PrintJob["status"], string> = {
   PENDING:  "bg-yellow-100 text-yellow-700 border border-yellow-200",
   CLAIMED:  "bg-blue-100   text-blue-700   border border-blue-200",
   DONE:     "bg-green-100  text-green-700  border border-green-200",
-  FAILED:   "bg-red-100    text-red-700    border border-red-200",
+  FAILED:   "bg-orange-100    text-orange-700    border border-orange-200",
 };
 
 export function FilaImpressaoDebug() {
@@ -61,7 +61,7 @@ export function FilaImpressaoDebug() {
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 mb-3">{error} — a tabela print_jobs pode não existir ainda (rode a migration).</p>
+        <p className="text-xs text-orange-500 mb-3">{error} — a tabela print_jobs pode não existir ainda (rode a migration).</p>
       )}
 
       {!error && jobs.length === 0 && !loading && (

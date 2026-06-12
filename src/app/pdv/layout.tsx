@@ -56,7 +56,7 @@ export default async function PdvLayout({
           <form action={logout}>
             <button
               type="submit"
-              className="text-sm font-medium text-red-600 hover:bg-red-50 border border-red-200 rounded-xl px-3 py-1.5 transition"
+              className="text-sm font-medium text-orange-600 hover:bg-orange-50 border border-orange-200 rounded-xl px-3 py-1.5 transition"
             >
               Sair
             </button>

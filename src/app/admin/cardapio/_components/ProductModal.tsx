@@ -173,7 +173,7 @@ export default function ProductModal({ product, categories, ingredients, onClose
         </div>
 
         {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+          <div className="mb-4 text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
             {error}
           </div>
         )}
@@ -330,7 +330,7 @@ export default function ProductModal({ product, categories, ingredients, onClose
                       <button
                         type="button"
                         onClick={() => removeRecipeRow(idx)}
-                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition"
+                        className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition"
                       >
                         <Trash2 size={13} />
                       </button>

@@ -76,7 +76,7 @@ const ITEM_STATUS_CONFIG: Record<OrderItemStatus, { label: string; icon: React.R
   PREPARANDO: { label: "Preparando", icon: <ChefHat size={12} />,      color: "text-orange-600" },
   PRONTO:     { label: "Pronto",     icon: <CheckCircle2 size={12} />, color: "text-green-600"  },
   ENTREGUE:   { label: "Entregue",   icon: <CheckCircle2 size={12} />, color: "text-gray-400"   },
-  CANCELADO:  { label: "Cancelado",  icon: <Minus size={12} />,        color: "text-red-500"    },
+  CANCELADO:  { label: "Cancelado",  icon: <Minus size={12} />,        color: "text-orange-500"    },
 };
 
 const TABLE_STATUS_LABEL: Record<string, string> = {
@@ -239,7 +239,7 @@ export default function MesaDetailClient({ table, products, categories, orders: 
             className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg
               ${t.type === "success"
                 ? "bg-green-50 border border-green-200 text-green-700"
-                : "bg-red-50 border border-red-200 text-red-700"
+                : "bg-orange-50 border border-orange-200 text-orange-700"
               }`}
           >
             {t.type === "success" ? <CheckCircle2 size={15} /> : null}
@@ -460,7 +460,7 @@ export default function MesaDetailClient({ table, products, categories, orders: 
                       </button>
                       <button
                         onClick={() => removeFromCart(item.productId)}
-                        className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition ml-1"
+                        className="w-7 h-7 rounded-lg hover:bg-orange-50 flex items-center justify-center text-gray-400 hover:text-orange-500 transition ml-1"
                       >
                         <Trash2 size={12} />
                       </button>

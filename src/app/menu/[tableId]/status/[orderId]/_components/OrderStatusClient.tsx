@@ -36,7 +36,7 @@ const ITEM_STATUS: Record<OrderItemStatus, { label: string; icon: React.ReactNod
   PREPARANDO: { label: "Preparando",   icon: <ChefHat size={14} />,      color: "text-orange-700", bg: "bg-orange-50 border-orange-200" },
   PRONTO:     { label: "Pronto!",      icon: <CheckCircle2 size={14} />, color: "text-green-700",  bg: "bg-green-50 border-green-200"  },
   ENTREGUE:   { label: "Entregue",     icon: <CheckCircle2 size={14} />, color: "text-gray-500",   bg: "bg-gray-50 border-gray-200"    },
-  CANCELADO:  { label: "Cancelado",    icon: <Clock size={14} />,        color: "text-red-600",    bg: "bg-red-50 border-red-200"      },
+  CANCELADO:  { label: "Cancelado",    icon: <Clock size={14} />,        color: "text-orange-600",    bg: "bg-orange-50 border-orange-200"      },
 };
 
 const POLL_INTERVAL = 8000;

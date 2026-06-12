@@ -59,7 +59,7 @@ export default function CategoryModal({ category, onClose }: Props) {
         </div>
 
         {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2 flex items-center gap-2">
+          <div className="mb-4 text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 flex items-center gap-2">
             <AlertCircle size={14} />
             {error}
           </div>

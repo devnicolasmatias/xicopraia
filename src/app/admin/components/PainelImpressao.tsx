@@ -115,7 +115,7 @@ export function PainelImpressao() {
         <p className={`mt-3 text-xs px-3 py-2 rounded-xl ${
           status.tipo === "sucesso"
             ? "bg-green-50 text-green-700 border border-green-200"
-            : "bg-red-50 text-red-600 border border-red-200"
+            : "bg-orange-50 text-orange-600 border border-orange-200"
         }`}>
           {status.msg}
         </p>

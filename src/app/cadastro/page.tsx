@@ -124,7 +124,7 @@ export default function CadastroPage() {
             </div>
 
             {error && (
-              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <p className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
                 {error}
               </p>
             )}

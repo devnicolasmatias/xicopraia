@@ -279,7 +279,7 @@ export default function ConversasClient({
 
             {/* Error */}
             {error && (
-              <div className="mx-4 mb-2 bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+              <div className="mx-4 mb-2 bg-orange-50 border border-orange-200 text-orange-600 text-xs rounded-xl px-3 py-2 flex items-center justify-between gap-2">
                 {error}
                 <button onClick={() => setError("")}><X size={13} /></button>
               </div>
@@ -351,7 +351,7 @@ export default function ConversasClient({
                       {mediaFile ? mediaFile.name : `Selecionar ${sendMode === "image" ? "imagem" : sendMode === "audio" ? "áudio" : "arquivo"}`}
                     </button>
                     {mediaFile && (
-                      <button onClick={() => setMediaFile(null)} className="text-gray-400 hover:text-red-500">
+                      <button onClick={() => setMediaFile(null)} className="text-gray-400 hover:text-orange-500">
                         <X size={16} />
                       </button>
                     )}

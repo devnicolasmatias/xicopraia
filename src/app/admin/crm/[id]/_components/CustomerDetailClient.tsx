@@ -88,7 +88,7 @@ export default function CustomerDetailClient({ customer }: Props) {
             />
           </div>
           {error && (
-            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <p className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
               {error}
             </p>
           )}

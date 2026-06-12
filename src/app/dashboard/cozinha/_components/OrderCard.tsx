@@ -67,15 +67,15 @@ export default function OrderCard({ order, onActionDone }: Props) {
     <div
       className={`flex flex-col rounded-2xl border-2 overflow-hidden transition-all shadow-sm
         ${isExtreme
-          ? "border-red-400 shadow-red-100 animate-pulse bg-white"
+          ? "border-orange-400 shadow-orange-100 animate-pulse bg-white"
           : isUrgent
-          ? "border-red-300 shadow-red-50 bg-white"
+          ? "border-orange-300 shadow-orange-50 bg-white"
           : "border-gray-200 bg-white"
         }`}
     >
       {/* Card header */}
       <div className={`px-4 py-3 flex items-center justify-between
-        ${isExtreme ? "bg-red-50" : isUrgent ? "bg-red-50/50" : "bg-gray-50"}`}
+        ${isExtreme ? "bg-orange-50" : isUrgent ? "bg-orange-50/50" : "bg-gray-50"}`}
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl font-black text-gray-900">
@@ -84,7 +84,7 @@ export default function OrderCard({ order, onActionDone }: Props) {
           <div>
             <p className="text-xs text-gray-400 leading-none">Mesa</p>
             <p className={`text-xs font-medium flex items-center gap-1 mt-0.5
-              ${isUrgent ? "text-red-600" : "text-gray-500"}`}
+              ${isUrgent ? "text-orange-600" : "text-gray-500"}`}
             >
               {isUrgent ? <AlertTriangle size={11} /> : <Clock size={11} />}
               {elapsedLabel(order.createdAt)}
@@ -95,7 +95,7 @@ export default function OrderCard({ order, onActionDone }: Props) {
 
         <div className="flex items-center gap-2">
           {isExtreme && (
-            <span className="flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-[10px] font-bold text-orange-600 bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-full">
               <Zap size={9} /> URGENTE
             </span>
           )}

@@ -268,7 +268,7 @@ export default function FechamentoClient({ table, orders }: Props) {
 
             {nfceState.status === "error" && (
               <div className="space-y-2">
-                <p className="text-sm text-red-600">{nfceState.msg}</p>
+                <p className="text-sm text-orange-600">{nfceState.msg}</p>
                 <button
                   onClick={handleEmitirNfce}
                   className="text-xs text-gray-400 hover:text-gray-700 transition"
@@ -515,7 +515,7 @@ export default function FechamentoClient({ table, orders }: Props) {
 
           {/* ── Erro ── */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
+            <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-sm text-orange-600">
               {error}
             </div>
           )}

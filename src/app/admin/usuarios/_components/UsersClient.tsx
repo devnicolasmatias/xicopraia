@@ -156,7 +156,7 @@ export default function UsersClient({ initialUsers }: Props) {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                         <span className={`inline-flex items-center gap-1.5 ${user.active ? 'text-green-600' : 'text-red-500'}`}>
+                         <span className={`inline-flex items-center gap-1.5 ${user.active ? 'text-green-600' : 'text-orange-500'}`}>
                            {user.active ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
                            {user.active ? 'Ativo' : 'Bloqueado'}
                          </span>
@@ -175,7 +175,7 @@ export default function UsersClient({ initialUsers }: Props) {
                              disabled={isPending}
                              className={`p-1.5 rounded-lg transition text-sm font-medium border
                                ${user.active 
-                                 ? 'text-red-600 hover:bg-red-50 border-transparent hover:border-red-200' 
+                                 ? 'text-orange-600 hover:bg-orange-50 border-transparent hover:border-orange-200' 
                                  : 'text-green-600 hover:bg-green-50 border-transparent hover:border-green-200'
                                }`}
                            >
@@ -207,7 +207,7 @@ export default function UsersClient({ initialUsers }: Props) {
             
             <form onSubmit={handleSubmit} className="p-6">
               {error && (
-                <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-200">
+                <div className="mb-4 p-3 bg-orange-50 text-orange-600 text-sm rounded-xl border border-orange-200">
                   {error}
                 </div>
               )}

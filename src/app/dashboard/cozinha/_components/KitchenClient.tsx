@@ -118,7 +118,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
                 <Clock size={10} />
                 Atualiza em {countdown}s
               </span>
-              <span className={`text-xs flex items-center gap-1 ${isOnline ? "text-green-600" : "text-red-500"}`}>
+              <span className={`text-xs flex items-center gap-1 ${isOnline ? "text-green-600" : "text-orange-500"}`}>
                 {isOnline ? <Wifi size={10} /> : <WifiOff size={10} />}
                 {isOnline ? "Online" : "Offline"}
               </span>
@@ -134,7 +134,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
               {totalItems} item{totalItems !== 1 ? "s" : ""}
             </span>
             {urgentCount > 0 && (
-              <span className="text-xs bg-red-100 border border-red-200 text-red-600 px-2.5 py-1 rounded-full font-medium">
+              <span className="text-xs bg-orange-100 border border-orange-200 text-orange-600 px-2.5 py-1 rounded-full font-medium">
                 {urgentCount} urgente{urgentCount !== 1 ? "s" : ""}
               </span>
             )}
@@ -163,7 +163,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
             {orders.length} pedidos · {totalItems} itens
           </span>
           {urgentCount > 0 && (
-            <span className="text-xs bg-red-100 border border-red-200 text-red-600 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-orange-100 border border-orange-200 text-orange-600 px-2 py-0.5 rounded-full">
               {urgentCount} urgente{urgentCount !== 1 ? "s" : ""}
             </span>
           )}

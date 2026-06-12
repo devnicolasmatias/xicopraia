@@ -381,7 +381,7 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
             <p className="text-xl text-gray-500">Com DDD, para identificar sua conta</p>
           </div>
           {error && (
-            <p className="text-red-600 text-center text-lg bg-red-50 rounded-xl py-3 px-5">{error}</p>
+            <p className="text-orange-600 text-center text-lg bg-orange-50 rounded-xl py-3 px-5">{error}</p>
           )}
           <div className="w-full max-w-sm border-2 border-blue-400 rounded-2xl py-5 px-6 text-center bg-white shadow-inner">
             {phoneInput ? (
@@ -582,7 +582,7 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => updateQty(item.productId, -1)} className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
-                  {item.quantity === 1 ? <Trash2 size={15} className="text-red-400" /> : <Minus size={15} className="text-gray-600" />}
+                  {item.quantity === 1 ? <Trash2 size={15} className="text-orange-400" /> : <Minus size={15} className="text-gray-600" />}
                 </button>
                 <span className="font-black text-base w-6 text-center text-gray-900">{item.quantity}</span>
                 <button onClick={() => updateQty(item.productId, 1)} className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center text-white">
@@ -734,8 +734,8 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
   function renderPagamentoRecusado() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-8 px-8">
-        <div className="w-28 h-28 bg-red-100 rounded-full flex items-center justify-center">
-          <AlertCircle size={56} className="text-red-500" />
+        <div className="w-28 h-28 bg-orange-100 rounded-full flex items-center justify-center">
+          <AlertCircle size={56} className="text-orange-500" />
         </div>
         <div className="text-center space-y-3">
           <h2 className="text-3xl font-black text-gray-900">Pagamento não aprovado</h2>

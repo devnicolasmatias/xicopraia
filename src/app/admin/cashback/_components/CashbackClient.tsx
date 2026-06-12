@@ -170,7 +170,7 @@ export default function CashbackClient({ configPercentage, configExpiryDays }: P
               </div>
               <button
                 onClick={handleClear}
-                className="text-gray-400 hover:text-red-500 transition"
+                className="text-gray-400 hover:text-orange-500 transition"
               >
                 <X size={18} />
               </button>
@@ -281,7 +281,7 @@ export default function CashbackClient({ configPercentage, configExpiryDays }: P
                     />
                   </div>
                   {newError && (
-                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+                    <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
                       {newError}
                     </p>
                   )}
@@ -329,7 +329,7 @@ export default function CashbackClient({ configPercentage, configExpiryDays }: P
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-2 flex items-center gap-2">
+            <div className="bg-orange-50 border border-orange-200 text-orange-600 text-sm rounded-xl px-4 py-2 flex items-center gap-2">
               <AlertTriangle size={14} /> {error}
             </div>
           )}
