@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Paleta primária Boteco4075 — vermelho escuro #431007 */
+  --color-orange-50:  #fdf2f0;
+  --color-orange-100: #f9d5d0;
+  --color-orange-200: #eeaaa1;
+  --color-orange-300: #c45a50;
+  --color-orange-400: #7a1f14;
+  --color-orange-500: #431007;
+  --color-orange-600: #360d06;
+  --color-orange-700: #290a04;
+  --color-orange-800: #1e0703;
+  --color-orange-900: #140502;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}

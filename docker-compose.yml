@@ -1,0 +1,49 @@
+services:
+  gonzaga-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_QZ_CERTIFICATE=${NEXT_PUBLIC_QZ_CERTIFICATE}
+    container_name: restaurante_gonzaga_app
+    restart: unless-stopped
+    networks:
+      - webproxy
+      - app-network
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - QZ_PRIVATE_KEY=${QZ_PRIVATE_KEY}
+      - NEXT_PUBLIC_QZ_CERTIFICATE=${NEXT_PUBLIC_QZ_CERTIFICATE}
+      - EVOLUTION_API_URL=${EVOLUTION_API_URL}
+      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+      - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME}
+    depends_on:
+      - gonzaga-db
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.gonzaga-app.rule=Host(`xicopraia.com.br`)'
+      - 'traefik.http.routers.gonzaga-app.entrypoints=websecure'
+      - 'traefik.http.routers.gonzaga-app.tls.certresolver=myresolver'
+      - 'traefik.http.services.gonzaga-app.loadbalancer.server.port=3000'
+      - 'traefik.docker.network=webproxy'
+
+  gonzaga-db:
+    image: postgres:15-alpine
+    container_name: restaurante_gonzaga_db
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+networks:
+  webproxy:
+    external: true
+  app-network:
+    driver: bridge

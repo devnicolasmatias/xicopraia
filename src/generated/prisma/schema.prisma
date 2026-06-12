@@ -1,0 +1,459 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  GARCOM
+  COZINHA
+  CAIXA
+}
+
+enum OrderStatus {
+  ABERTO
+  ENVIADO
+  FECHADO
+  PAGO
+  CANCELADO
+}
+
+enum PaymentMethod {
+  DINHEIRO
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+  PIX
+}
+
+enum OrderItemStatus {
+  PENDENTE
+  PREPARANDO
+  PRONTO
+  ENTREGUE
+  CANCELADO
+}
+
+enum TableStatus {
+  LIVRE
+  OCUPADA
+  PEDIU_CONTA
+  RESERVADA
+  AGUARDANDO_LIMPEZA
+}
+
+enum CashbackType {
+  EARNED
+  REDEEMED
+  MANUAL
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageType {
+  TEXT
+  AUDIO
+  IMAGE
+  FILE
+}
+
+// ─────────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(GARCOM)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  color     String    @default("#6b7280")
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String              @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal             @db.Decimal(10, 2)
+  costPrice   Decimal?            @db.Decimal(10, 2)
+  imageUrl    String?
+  ncm         String?             @default("21069090") // NCM para NFC-e
+  available   Boolean             @default(true)
+  categoryId  String
+  category    Category            @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  ingredients ProductIngredient[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@map("products")
+}
+
+model Table {
+  id             String      @id @default(cuid())
+  number         Int         @unique
+  status         TableStatus @default(LIVRE)
+  capacity       Int         @default(4)
+  customerName   String?
+  currentOrderId String?
+  openedAt       DateTime?
+  orders         Order[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@map("tables")
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  tableId     String
+  table       Table        @relation(fields: [tableId], references: [id])
+  customerId  String?
+  customer    Customer?    @relation(fields: [customerId], references: [id])
+  status      OrderStatus  @default(ABERTO)
+  total       Decimal      @default(0) @db.Decimal(10, 2)
+  items       OrderItem[]
+  transaction Transaction?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("orders")
+}
+
+model Ingredient {
+  id           String              @id @default(cuid())
+  name         String              @unique
+  unit         String // kg, g, un, l, ml
+  currentStock Decimal             @default(0) @db.Decimal(10, 3)
+  minimumStock Decimal             @default(0) @db.Decimal(10, 3)
+  products     ProductIngredient[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@map("ingredients")
+}
+
+model ProductIngredient {
+  id           String     @id @default(cuid())
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  quantity     Decimal    @db.Decimal(10, 3)
+  createdAt    DateTime   @default(now())
+
+  @@unique([productId, ingredientId])
+  @@map("product_ingredients")
+}
+
+model Transaction {
+  id               String        @id @default(cuid())
+  orderId          String        @unique
+  order            Order         @relation(fields: [orderId], references: [id])
+  paymentMethod    PaymentMethod
+  subtotal         Decimal       @db.Decimal(10, 2)
+  serviceFee       Decimal       @default(0) @db.Decimal(10, 2)
+  discount         Decimal       @default(0) @db.Decimal(10, 2)
+  cashbackDiscount Decimal       @default(0) @db.Decimal(10, 2)
+  total            Decimal       @db.Decimal(10, 2)
+  splitCount       Int           @default(1)
+  paidAt           DateTime      @default(now())
+  createdAt        DateTime      @default(now())
+  nfce             NfceDocument?
+
+  @@map("transactions")
+}
+
+model FiscalConfig {
+  id String @id @default(cuid())
+
+  // Dados da empresa
+  cnpj         String
+  razaoSocial  String
+  nomeFantasia String?
+  ie           String
+  crt          Int     @default(1) // 1=SN 2=SN excesso 3=Regime Normal
+
+  // Endereço
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  municipio   String
+  cMunicipio  String // código IBGE
+  uf          String
+  cep         String
+  telefone    String?
+
+  // Configuração NFC-e
+  serie      Int    @default(1)
+  proximoNNF Int    @default(1)
+  tpAmb      Int    @default(2) // 1=produção 2=homologação
+  cfop       String @default("5102")
+  csosn      String @default("400")
+
+  // QR Code / CSC
+  cIdToken String @default("")
+  csc      String @default("")
+
+  // Endpoints (deixar vazio para usar padrão do estado)
+  urlAutorizacao String?
+  urlQrCode      String?
+
+  // Tipo de emissão
+  tpEmis            Int       @default(1) // 1=Normal 9=Contingência Off-Line
+  dhContingencia    DateTime?
+  xJustContingencia String?
+
+  // Configuração de conexão
+  tlsVersion String @default("TLSv1.2")
+
+  // Certificado A1 (.pfx)
+  certBase64   String?   @db.Text
+  certSenha    String?
+  certValidade DateTime?
+  certCn       String? // Common Name do certificado
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("fiscal_config")
+}
+
+model NfceDocument {
+  id            String      @id @default(cuid())
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+
+  chave String @unique @db.VarChar(44)
+  nNF   Int
+  serie Int
+  tpAmb Int
+
+  // PENDENTE | AUTORIZADA | REJEITADA | CANCELADA
+  status String @default("PENDENTE")
+
+  // Retorno SEFAZ
+  protNFe  String?
+  dhRecbto String?
+  cStat    Int?
+  xMotivo  String?
+
+  // XMLs
+  xmlNFe     String? @db.Text
+  xmlProcNFe String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("nfce_documents")
+}
+
+model OrderItem {
+  id        String          @id @default(cuid())
+  orderId   String
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product         @relation(fields: [productId], references: [id])
+  quantity  Int             @default(1)
+  unitPrice Decimal         @db.Decimal(10, 2)
+  notes     String?
+  status    OrderItemStatus @default(PENDENTE)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@map("order_items")
+}
+
+model Customer {
+  id                   String                @id @default(cuid())
+  name                 String
+  phone                String                @unique
+  cpf                  String?               @unique
+  cashbackBalance      Decimal               @default(0) @db.Decimal(10, 2)
+  cashbackExpiresAt    DateTime?
+  orders               Order[]
+  cashbackTransactions CashbackTransaction[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+
+  @@map("customers")
+}
+
+model CashbackConfig {
+  id         String   @id @default(cuid())
+  percentage Decimal  @db.Decimal(5, 2)
+  expiryDays Int      @default(30)
+  updatedAt  DateTime @updatedAt
+
+  @@map("cashback_config")
+}
+
+model CashbackTransaction {
+  id             String       @id @default(cuid())
+  customerId     String
+  customer       Customer     @relation(fields: [customerId], references: [id])
+  orderId        String?
+  type           CashbackType
+  amount         Decimal      @db.Decimal(10, 2)
+  purchaseAmount Decimal?     @db.Decimal(10, 2)
+  expiresAt      DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@map("cashback_transactions")
+}
+
+model WhatsappMessage {
+  id        String           @id @default(cuid())
+  phone     String
+  direction MessageDirection
+  type      MessageType      @default(TEXT)
+  content   String?          @db.Text
+  mediaUrl  String?
+  mediaName String?
+  messageId String?          @unique
+  createdAt DateTime         @default(now())
+
+  @@index([phone])
+  @@map("whatsapp_messages")
+}
+
+// --- ENUMS ---
+
+// Centralizamos as unidades para evitar que alguém digite "Kilo", "KG", "kg" ou "kilos".
+// Isso salva a vida na hora de agrupar relatórios!
+enum UnitOfMeasure {
+  KG // Quilograma
+  G // Grama
+  L // Litro
+  ML // Mililitro
+  UN // Unidade
+  CX // Caixa
+  PCT // Pacote
+  DZ // Dúzia
+}
+
+// --- MÓDULO DE CADASTRO BASE (MASTER DATA) ---
+
+model InventoryCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  color String
+
+  items InventoryItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Se for NULL, está ativo. Se tiver data, está "apagado".
+
+  @@map("inventory_categories")
+}
+
+model InventoryItem {
+  id            String        @id @default(cuid())
+  name          String
+  unitOfMeasure UnitOfMeasure // Usando o Enum aqui
+
+  categoryId String
+  category   InventoryCategory @relation(fields: [categoryId], references: [id])
+
+  // Relação reversa para o histórico diário (agora segura graças ao Soft Delete)
+  dailyRecords DailyStockItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Soft Delete em ação
+
+  @@map("inventory_items")
+}
+
+// --- MÓDULO DE FOTOGRAFIA DIÁRIA (SNAPSHOTS) ---
+
+model DailyStock {
+  id   String   @id @default(cuid())
+  date DateTime @unique @db.Date
+
+  items DailyStockItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("daily_stocks")
+}
+
+model DailyStockItem {
+  id String @id @default(cuid())
+
+  dailyStockId String
+  dailyStock   DailyStock @relation(fields: [dailyStockId], references: [id], onDelete: Cascade)
+
+  // CHAVE ESTRANGEIRA SEGURA
+  // Como temos o deletedAt no InventoryItem, o Prisma nunca vai quebrar essa relação.
+  itemId String
+  item   InventoryItem @relation(fields: [itemId], references: [id])
+
+  // DADOS DESNORMALIZADOS (O Snapshot visual)
+  // Essencial para blindar o histórico contra EDIÇÕES no InventoryItem original.
+  itemName      String
+  categoryName  String
+  unitOfMeasure UnitOfMeasure
+
+  quantity Decimal @default(0) @db.Decimal(10, 3)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("daily_stock_items")
+}
+
+// --- MÓDULO DE FILA DE IMPRESSÃO ---
+
+enum PrintJobStatus {
+  PENDING
+  CLAIMED
+  DONE
+  FAILED
+}
+
+model PrintJob {
+  id        String         @id @default(cuid())
+  content   String         @db.Text
+  descricao String?
+  status    PrintJobStatus @default(PENDING)
+  claimedBy String?
+  claimedAt DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([status, createdAt])
+  @@map("print_jobs")
+}
