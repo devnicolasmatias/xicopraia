@@ -23,7 +23,7 @@ services:
       - gonzaga-db
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.gonzaga-app.rule=Host(`xicopraia.com.br`)'
+      - 'traefik.http.routers.gonzaga-app.rule=Host(`gonzagas.boteco4075.com.br`)'
       - 'traefik.http.routers.gonzaga-app.entrypoints=websecure'
       - 'traefik.http.routers.gonzaga-app.tls.certresolver=myresolver'
       - 'traefik.http.services.gonzaga-app.loadbalancer.server.port=3000'

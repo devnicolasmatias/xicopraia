@@ -80,7 +80,7 @@ export interface PdvSaleInput {
  * Itens vão como ENTREGUE para não aparecer na cozinha.
  */
 export async function completePdvSale(input: PdvSaleInput) {
-  await requirePdvAccess();
+  const session = await requirePdvAccess();
 
   const { items, paymentMethod, discountAmount, customerId, redeemCashback } = input;
 
@@ -105,6 +105,7 @@ export async function completePdvSale(input: PdvSaleInput) {
     const created = await tx.order.create({
       data: {
         tableId: pdvTable.id,
+        userId: session.userId,
         customerId: customerId ?? null,
         total,
         status: "PAGO",

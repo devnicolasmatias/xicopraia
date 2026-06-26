@@ -19,6 +19,7 @@ export async function getTableOrdersForCheckout(tableId: string) {
     },
     orderBy: { createdAt: "asc" },
     include: {
+      user: { select: { name: true } },
       items: {
         where: { status: { not: "CANCELADO" } },
         orderBy: { createdAt: "asc" },
@@ -116,6 +117,14 @@ export async function closeOrder(input: CloseOrderInput) {
       });
     }
 
+    // Marca itens pendentes/preparando como ENTREGUE para sumir do KDS
+    for (const order of orders) {
+      await tx.orderItem.updateMany({
+        where: { orderId: order.id, status: { in: ["PENDENTE", "PREPARANDO"] } },
+        data: { status: "ENTREGUE" },
+      });
+    }
+
     // Libera a mesa
     await tx.table.update({
       where: { id: tableId },
@@ -137,6 +146,7 @@ export async function closeOrder(input: CloseOrderInput) {
 
   revalidatePath("/dashboard/mesas");
   revalidatePath(`/dashboard/mesas/${tableId}`);
+  revalidatePath("/dashboard/cozinha");
   revalidatePath("/admin/financeiro");
   return { success: true, transactionId: txn?.id };
 }

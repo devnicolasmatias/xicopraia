@@ -293,9 +293,9 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
       <div className="flex flex-col h-full">
         <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-8 gap-4">
           <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Xico Praia" width={56} height={56} unoptimized />
+            <Image src="/logo.png" alt="Boteco4075" width={56} height={56} unoptimized />
             <div>
-              <p className="text-3xl font-black text-orange-500 leading-tight">Xico Praia</p>
+              <p className="text-3xl font-black text-orange-500 leading-tight">Boteco4075</p>
               <p className="text-gray-500 text-base">Faça seu pedido aqui!</p>
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
             <p className="text-xl text-gray-500">Com DDD, para identificar sua conta</p>
           </div>
           {error && (
-            <p className="text-orange-600 text-center text-lg bg-orange-50 rounded-xl py-3 px-5">{error}</p>
+            <p className="text-red-600 text-center text-lg bg-red-50 rounded-xl py-3 px-5">{error}</p>
           )}
           <div className="w-full max-w-sm border-2 border-blue-400 rounded-2xl py-5 px-6 text-center bg-white shadow-inner">
             {phoneInput ? (
@@ -582,7 +582,7 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => updateQty(item.productId, -1)} className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
-                  {item.quantity === 1 ? <Trash2 size={15} className="text-orange-400" /> : <Minus size={15} className="text-gray-600" />}
+                  {item.quantity === 1 ? <Trash2 size={15} className="text-red-400" /> : <Minus size={15} className="text-gray-600" />}
                 </button>
                 <span className="font-black text-base w-6 text-center text-gray-900">{item.quantity}</span>
                 <button onClick={() => updateQty(item.productId, 1)} className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center text-white">
@@ -709,7 +709,7 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
   }
 
   function renderPagamentoPix() {
-    const pixPayload = `00020126580014BR.GOV.BCB.PIX0136xicopraia-${Date.now()}520400005303986540${total.toFixed(2).padStart(6, "0")}5802BR5913Xico Praia 6009SAO PAULO6304ABCD`;
+    const pixPayload = `00020126580014BR.GOV.BCB.PIX0136boteco4075-${Date.now()}520400005303986540${total.toFixed(2).padStart(6, "0")}5802BR5913Boteco 4075 6009SAO PAULO6304ABCD`;
     return (
       <div className="flex flex-col items-center justify-center h-full gap-6 px-8">
         <div className="text-center">
@@ -734,8 +734,8 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
   function renderPagamentoRecusado() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-8 px-8">
-        <div className="w-28 h-28 bg-orange-100 rounded-full flex items-center justify-center">
-          <AlertCircle size={56} className="text-orange-500" />
+        <div className="w-28 h-28 bg-red-100 rounded-full flex items-center justify-center">
+          <AlertCircle size={56} className="text-red-500" />
         </div>
         <div className="text-center space-y-3">
           <h2 className="text-3xl font-black text-gray-900">Pagamento não aprovado</h2>
@@ -819,9 +819,9 @@ export default function TotemClient({ products, categories, cashbackConfig }: Pr
       {/* Header */}
       <div className="bg-orange-500 px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <Image src="/logo.png" alt="Xico Praia" width={52} height={52} unoptimized />
+          <Image src="/logo.png" alt="Boteco4075" width={52} height={52} unoptimized />
           <div>
-            <p className="text-white font-black text-2xl leading-tight">Xico Praia</p>
+            <p className="text-white font-black text-2xl leading-tight">Boteco4075</p>
             <p className="text-orange-100 text-sm">Autoatendimento</p>
           </div>
         </div>

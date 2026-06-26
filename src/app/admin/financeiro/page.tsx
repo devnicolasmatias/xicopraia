@@ -16,7 +16,9 @@ export default async function FinanceiroPage({
   searchParams: Promise<{ from?: string; to?: string }>;
 }) {
   const session = await getSession();
-  if (!session || session.role !== "ADMIN") redirect("/pdv");
+  if (!session) redirect("/login");
+  const isGarcom = session.role === "GARCOM";
+  if (!isGarcom && session.role !== "ADMIN" && session.role !== "GERENTE" && session.role !== "CAIXA") redirect("/pdv");
 
   const sp = await searchParams;
   const today = new Date();
@@ -49,7 +51,9 @@ export default async function FinanceiroPage({
           <Image src="/logo.png" alt="" width={40} height={40} className="shrink-0 hidden sm:block" />
           <div className="min-w-0">
             <h1 className="font-bold text-gray-900 truncate">Financeiro</h1>
-            <p className="text-xs text-gray-500 truncate">Faturamento e transações</p>
+            <p className="text-xs text-gray-500 truncate">
+              {isGarcom ? "Consultar pedidos finalizados" : "Faturamento e transações"}
+            </p>
           </div>
         </div>
       </div>
@@ -60,7 +64,7 @@ export default async function FinanceiroPage({
             {rangeError}
           </div>
         )}
-        <FinanceiroClient initialFrom={fromStr} initialTo={toStr} report={report} />
+        <FinanceiroClient initialFrom={fromStr} initialTo={toStr} report={report} userRole={session.role} />
       </div>
     </div>
   );

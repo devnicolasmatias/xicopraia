@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTable } from "@/app/actions/tables";
 import { getTableOrders, getProductsForPDV } from "@/app/actions/orders";
+import { getSession } from "@/lib/session";
 import MesaDetailClient from "./_components/MesaDetailClient";
 
 interface Props {
@@ -11,12 +12,14 @@ interface Props {
 export default async function MesaDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const [table, orders, { products, categories }] = await Promise.all([
+  const [session, table, orders, { products, categories }] = await Promise.all([
+    getSession(),
     getTable(id),
     getTableOrders(id),
     getProductsForPDV(),
   ]);
 
+  if (!session) redirect("/login");
   if (!table) notFound();
 
   // Serializa Decimal → number para passar ao Client Component
@@ -28,6 +31,7 @@ export default async function MesaDetailPage({ params }: Props) {
   const serializedOrders = orders.map((o) => ({
     ...o,
     total: parseFloat(String(o.total)),
+    userName: o.user?.name ?? null,
     createdAt: new Date(o.createdAt),
     items: o.items.map((i) => ({
       ...i,
@@ -47,6 +51,7 @@ export default async function MesaDetailPage({ params }: Props) {
       products={serializedProducts}
       categories={categories}
       orders={serializedOrders}
+      userName={session.name}
     />
   );
 }

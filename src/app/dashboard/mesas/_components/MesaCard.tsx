@@ -20,7 +20,7 @@ interface Props {
 
 const STATUS_CONFIG: Record<TableStatus, { label: string; bg: string; border: string; dot: string; text: string }> = {
   LIVRE:              { label: "Livre",          bg: "bg-green-50",   border: "border-green-200",  dot: "bg-green-500",  text: "text-green-700"  },
-  OCUPADA:            { label: "Ocupada",         bg: "bg-orange-50",     border: "border-orange-200",    dot: "bg-orange-500",    text: "text-orange-700"    },
+  OCUPADA:            { label: "Ocupada",         bg: "bg-red-50",     border: "border-red-200",    dot: "bg-red-500",    text: "text-red-700"    },
   PEDIU_CONTA:        { label: "Pediu a conta",   bg: "bg-yellow-50",  border: "border-yellow-200", dot: "bg-yellow-500", text: "text-yellow-700" },
   RESERVADA:          { label: "Reservada",       bg: "bg-blue-50",    border: "border-blue-200",   dot: "bg-blue-500",   text: "text-blue-700"   },
   AGUARDANDO_LIMPEZA: { label: "Limpeza",         bg: "bg-gray-100",   border: "border-gray-200",   dot: "bg-gray-400",   text: "text-gray-500"   },

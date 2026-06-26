@@ -5,9 +5,18 @@ import { getSession } from "@/lib/session";
 import { PDV_TABLE_NUMBER } from "@/lib/pdvConstants";
 import type { PaymentMethod } from "@/generated/prisma";
 
-async function requireAdmin() {
+async function requireAdminOrGerente() {
   const session = await getSession();
-  if (!session || session.role !== "ADMIN") throw new Error("Acesso negado.");
+  if (!session || (session.role !== "ADMIN" && session.role !== "GERENTE")) throw new Error("Acesso negado.");
+  return session;
+}
+
+async function requireFinanceiroAccess() {
+  const session = await getSession();
+  if (!session) throw new Error("Acesso negado.");
+  const allowed = ["ADMIN", "GERENTE", "CAIXA", "GARCOM"];
+  if (!allowed.includes(session.role)) throw new Error("Acesso negado.");
+  return session;
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -54,11 +63,85 @@ export interface FinancialReport {
   }[];
 }
 
+const DELETE_PASSWORD = "280223";
+
+export async function deleteTransaction(transactionId: string, password: string) {
+  await requireAdminOrGerente();
+
+  if (password !== DELETE_PASSWORD) {
+    return { error: "Senha incorreta." };
+  }
+
+  const tx = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+    include: { nfce: true },
+  });
+  if (!tx) return { error: "Transação não encontrada." };
+
+  if (tx.nfce && tx.nfce.status === "AUTORIZADA") {
+    return { error: "Não é possível excluir uma venda com NFC-e autorizada. Cancele a NFC-e primeiro." };
+  }
+
+  await prisma.$transaction(async (p) => {
+    if (tx.nfce) {
+      await p.nfceDocument.delete({ where: { id: tx.nfce.id } });
+    }
+    await p.transaction.delete({ where: { id: transactionId } });
+    await p.orderItem.deleteMany({ where: { orderId: tx.orderId } });
+    await p.order.delete({ where: { id: tx.orderId } });
+  });
+
+  return { success: true };
+}
+
+export interface OrderDetail {
+  id: string;
+  tableNumber: number;
+  userName: string | null;
+  createdAt: string;
+  items: { name: string; quantity: number; unitPrice: number; notes: string | null }[];
+}
+
+export async function getOrderDetail(orderId: string): Promise<OrderDetail | null> {
+  await requireFinanceiroAccess();
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      table: { select: { number: true } },
+      user: { select: { name: true } },
+      items: {
+        where: { status: { not: "CANCELADO" } },
+        orderBy: { createdAt: "asc" },
+        include: { product: { select: { name: true } } },
+      },
+    },
+  });
+
+  if (!order) return null;
+
+  return {
+    id: order.id,
+    tableNumber: order.table.number,
+    userName: order.user?.name ?? null,
+    createdAt: order.createdAt.toISOString(),
+    items: order.items.map((i) => ({
+      name: i.product.name,
+      quantity: i.quantity,
+      unitPrice: parseFloat(String(i.unitPrice)),
+      notes: i.notes,
+    })),
+  };
+}
+
 export async function getFinancialReport(fromStr: string, toStr: string): Promise<FinancialReport> {
-  await requireAdmin();
+  await requireFinanceiroAccess();
   const { start, end } = parseRange(fromStr, toStr);
 
-  const where = { paidAt: { gte: start, lte: end } };
+  const where = {
+    paidAt: { gte: start, lte: end },
+    NOT: { nfce: { status: "CANCELADA" } },
+  };
 
   const [aggregate, paymentGroups, txRows] = await Promise.all([
     prisma.transaction.aggregate({

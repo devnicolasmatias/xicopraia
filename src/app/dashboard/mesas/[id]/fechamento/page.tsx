@@ -26,6 +26,7 @@ export default async function FechamentoPage({ params }: Props) {
   const serializedOrders = orders.map((o) => ({
     ...o,
     total: parseFloat(String(o.total)),
+    userName: o.user?.name ?? null,
     createdAt: o.createdAt.toISOString(),
     updatedAt: o.updatedAt.toISOString(),
     items: o.items.map((i) => ({

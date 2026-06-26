@@ -148,14 +148,15 @@ export const ImpressaoService = {
    */
   async imprimirTeste(nomeImpressora: string): Promise<void> {
     const agora = new Date().toLocaleString("pt-BR");
-    const separador = "--------------------------------\n";
+    const separador = "------------------------------------------------\n";
 
     const comandosTeste = [
       "\x1B\x40",           // inicializar impressora
+      "\x1B\x21\x10",       // fonte altura dupla (base)
       "\x1B\x61\x01",       // centralizar
       "\x1B\x21\x30",       // fonte dupla altura + largura
       "Ciel\n",
-      "\x1B\x21\x00",       // fonte normal
+      "\x1B\x21\x10",       // fonte altura dupla
       "Teste de Impressao\n",
       "\x1B\x61\x00",       // alinhar esquerda
       separador,

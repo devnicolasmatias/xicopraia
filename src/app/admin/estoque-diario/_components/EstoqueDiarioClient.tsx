@@ -127,7 +127,7 @@ export default function EstoqueDiarioClient({ userRole, initialCategories, initi
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg border
-            ${toast.type === "error" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-green-50 border-green-200 text-green-700"}`}>
+            ${toast.type === "error" ? "bg-red-50 border-red-200 text-red-600" : "bg-green-50 border-green-200 text-green-700"}`}>
           <AlertCircle size={16} />
           {toast.msg}
         </div>
@@ -143,7 +143,7 @@ export default function EstoqueDiarioClient({ userRole, initialCategories, initi
           >
             <ArrowLeft size={20} className="text-gray-500" />
           </button>
-          <Image src="/logo.png" alt="Xico Praia" width={44} height={44} unoptimized />
+          <Image src="/logo.png" alt="Boteco4075" width={44} height={44} unoptimized />
           <div>
             <h1 className="text-xl font-bold text-gray-900">Estoque Diário</h1>
             <p className="text-gray-500 text-sm mt-0.5">Gestão de Snapshot Diário</p>
@@ -267,7 +267,7 @@ export default function EstoqueDiarioClient({ userRole, initialCategories, initi
                     <button onClick={() => setItemModal({ open: true, item: i })} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition">
                       <Pencil size={15} />
                     </button>
-                    <button onClick={() => handleDeleteItem(i.id)} disabled={isPending} className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition">
+                    <button onClick={() => handleDeleteItem(i.id)} disabled={isPending} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition">
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -304,7 +304,7 @@ export default function EstoqueDiarioClient({ userRole, initialCategories, initi
                         <button onClick={() => setItemModal({ open: true, item: i })} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition">
                           <Pencil size={15} />
                         </button>
-                        <button onClick={() => handleDeleteItem(i.id)} disabled={isPending} className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition">
+                        <button onClick={() => handleDeleteItem(i.id)} disabled={isPending} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition">
                           <Trash2 size={15} />
                         </button>
                       </div>
@@ -330,7 +330,7 @@ export default function EstoqueDiarioClient({ userRole, initialCategories, initi
                   <button onClick={() => setCategoryModal({ open: true, item: cat })} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition">
                     <Pencil size={15} />
                   </button>
-                  <button onClick={() => handleDeleteCategory(cat.id)} disabled={isPending} className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition">
+                  <button onClick={() => handleDeleteCategory(cat.id)} disabled={isPending} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition">
                     <Trash2 size={15} />
                   </button>
                 </div>

@@ -155,7 +155,7 @@ export default function MenuClient({ table, products, categories }: Props) {
       <div className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-3 shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Xico Praia" width={36} height={36} unoptimized />
+            <Image src="/logo.png" alt="Boteco4075" width={36} height={36} unoptimized />
             <div>
               <h1 className="font-bold text-base text-gray-900">Mesa {table.number}</h1>
               {table.customerName && (
@@ -349,7 +349,7 @@ export default function MenuClient({ table, products, categories }: Props) {
                       </button>
                       <button
                         onClick={() => updateQty(item.productId, -item.quantity)}
-                        className="w-7 h-7 rounded-lg hover:bg-orange-50 flex items-center justify-center text-gray-400 hover:text-orange-500 transition ml-0.5"
+                        className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition ml-0.5"
                       >
                         <Trash2 size={11} />
                       </button>
@@ -384,7 +384,7 @@ export default function MenuClient({ table, products, categories }: Props) {
 
             <div className="px-5 py-4 border-t border-gray-200 space-y-3">
               {error && (
-                <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">{error}</p>
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>
               )}
               <div className="flex justify-between text-sm text-gray-500">
                 <span>Total</span>

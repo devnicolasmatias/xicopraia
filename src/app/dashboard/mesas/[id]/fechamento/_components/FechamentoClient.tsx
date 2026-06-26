@@ -29,6 +29,7 @@ interface OrderData {
   total: number;
   createdAt: string;
   items: OrderItemData[];
+  userName: string | null;
 }
 
 interface TableData {
@@ -61,6 +62,10 @@ export default function FechamentoClient({ table, orders }: Props) {
   const allItems = orders.flatMap((o) =>
     o.items.filter((i) => i.status !== "CANCELADO")
   );
+
+  const waiterNames = [...new Set(
+    orders.map((o) => o.userName?.split(" ")[0]).filter(Boolean)
+  )];
 
   const subtotal = allItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
 
@@ -108,11 +113,13 @@ export default function FechamentoClient({ table, orders }: Props) {
 
     const comandos: string[] = [
       "\x1B\x40",                   // inicializar impressora
+      "\x1B\x21\x10",               // fonte altura dupla (base)
       "\x1B\x61\x01",               // centralizar
-      "\x1B\x45\x01",               // negrito on
+      "\x1B\x21\x30",               // fonte dupla altura + largura
       "COMPROVANTE\n",
-      "\x1B\x45\x00",               // negrito off
+      "\x1B\x21\x10",               // fonte altura dupla
       `Mesa ${table.number}${table.customerName ? ` - ${table.customerName}` : ""}\n`,
+      ...(waiterNames.length > 0 ? [`Garcom: ${waiterNames.join(", ")}\n`] : []),
       `${new Date().toLocaleString("pt-BR")}\n`,
       "\x1B\x61\x00",               // alinhar esquerda
       separador,
@@ -128,9 +135,9 @@ export default function FechamentoClient({ table, orders }: Props) {
         ? [padLine("Desconto", `- ${fmtPrice(discountAmount)}`)]
         : []),
       separador,
-      "\x1B\x45\x01",               // negrito on
+      "\x1B\x21\x30",               // fonte dupla altura + largura
       padLine("TOTAL", fmtPrice(total)),
-      "\x1B\x45\x00",               // negrito off
+      "\x1B\x21\x10",               // fonte altura dupla
       ...(splitCount > 1
         ? [padLine(`${splitCount}x por pessoa`, fmtPrice(total / splitCount))]
         : []),
@@ -268,7 +275,7 @@ export default function FechamentoClient({ table, orders }: Props) {
 
             {nfceState.status === "error" && (
               <div className="space-y-2">
-                <p className="text-sm text-orange-600">{nfceState.msg}</p>
+                <p className="text-sm text-red-600">{nfceState.msg}</p>
                 <button
                   onClick={handleEmitirNfce}
                   className="text-xs text-gray-400 hover:text-gray-700 transition"
@@ -515,7 +522,7 @@ export default function FechamentoClient({ table, orders }: Props) {
 
           {/* ── Erro ── */}
           {error && (
-            <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-sm text-orange-600">
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
               {error}
             </div>
           )}

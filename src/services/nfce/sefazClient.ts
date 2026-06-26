@@ -172,12 +172,22 @@ function parseResponse(xml: string): SefazResponse {
 }
 
 function parseCancelResponse(xml: string): SefazResponse {
-  const getTag = (tag: string) => xml.match(new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`))?.[1] ?? "";
-  const cStat = parseInt(getTag("cStat") || "0");
-  const xMotivo = getTag("xMotivo") || "Sem resposta";
+  const getTag = (tag: string, src = xml) => src.match(new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`))?.[1] ?? "";
+
+  let cStat = parseInt(getTag("cStat") || "0");
+  let xMotivo = getTag("xMotivo") || "Sem resposta";
+
+  // cStat 128 = Lote processado — status real do evento fica dentro de retEvento/infEvento
+  if (cStat === 128) {
+    const infEvento = xml.match(/<infEvento[^>]*>([\s\S]*?)<\/infEvento>/)?.[1] ?? "";
+    if (infEvento) {
+      cStat = parseInt(getTag("cStat", infEvento) || "0") || cStat;
+      xMotivo = getTag("xMotivo", infEvento) || xMotivo;
+    }
+  }
+
   const protNFe = getTag("nProt") || undefined;
   const dhRecbto = getTag("dhRegEvento") || getTag("dhRecbto") || undefined;
-  // 135 = Evento registrado e vinculado a NF-e
   const success = cStat === 135 || cStat === 136;
   return { success, cStat, xMotivo, protNFe, dhRecbto };
 }
@@ -195,39 +205,13 @@ function parseInutilizacaoResponse(xml: string): SefazResponse {
 // ─── Envelopes SOAP ──────────────────────────────────────────────────────────
 
 function buildEventoEnvelope(cUF: number, signedXml: string): string {
-  const body = signedXml.replace(/<\?xml[^?]*\?>\s*/, "");
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-  <soap12:Header>
-    <nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NfceRecepcaoEvento4">
-      <cUF>${cUF}</cUF>
-      <versaoDados>1.00</versaoDados>
-    </nfeCabecMsg>
-  </soap12:Header>
-  <soap12:Body>
-    <nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NfceRecepcaoEvento4">
-      ${body}
-    </nfeDadosMsg>
-  </soap12:Body>
-</soap12:Envelope>`;
+  const body = signedXml.replace(/<\?xml[^?]*\?>\s*/, "").trim();
+  return `<?xml version="1.0" encoding="UTF-8"?><soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"><soap12:Header><nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRecepcaoEvento4"><cUF>${cUF}</cUF><versaoDados>1.00</versaoDados></nfeCabecMsg></soap12:Header><soap12:Body><nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRecepcaoEvento4">${body}</nfeDadosMsg></soap12:Body></soap12:Envelope>`;
 }
 
 function buildInutilizacaoEnvelope(cUF: number, signedXml: string): string {
-  const body = signedXml.replace(/<\?xml[^?]*\?>\s*/, "");
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-  <soap12:Header>
-    <nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NfceInutilizacao4">
-      <cUF>${cUF}</cUF>
-      <versaoDados>4.00</versaoDados>
-    </nfeCabecMsg>
-  </soap12:Header>
-  <soap12:Body>
-    <nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NfceInutilizacao4">
-      ${body}
-    </nfeDadosMsg>
-  </soap12:Body>
-</soap12:Envelope>`;
+  const body = signedXml.replace(/<\?xml[^?]*\?>\s*/, "").trim();
+  return `<?xml version="1.0" encoding="UTF-8"?><soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"><soap12:Header><nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeInutilizacao4"><cUF>${cUF}</cUF><versaoDados>4.00</versaoDados></nfeCabecMsg></soap12:Header><soap12:Body><nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeInutilizacao4">${body}</nfeDadosMsg></soap12:Body></soap12:Envelope>`;
 }
 
 // ─── Envio para SEFAZ ────────────────────────────────────────────────────────
@@ -305,7 +289,7 @@ export async function cancelarNfce(
   const agent = await buildHttpsAgent(pfxBase64, certPassword, tlsVersion);
   try {
     const response = await axios.post(endpoint, envelope, {
-      headers: { "Content-Type": 'application/soap+xml; charset=UTF-8; action="http://www.portalfiscal.inf.br/nfe/wsdl/NfceRecepcaoEvento4/nfeDadosMsg"' },
+      headers: { "Content-Type": 'application/soap+xml; charset=UTF-8; action="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRecepcaoEvento4/nfeRecepcaoEvento"' },
       httpsAgent: agent,
       timeout: 30000,
     });
@@ -344,7 +328,7 @@ export async function inutilizarNfce(
   const agent = await buildHttpsAgent(pfxBase64, certPassword, tlsVersion);
   try {
     const response = await axios.post(endpoint, envelope, {
-      headers: { "Content-Type": 'application/soap+xml; charset=UTF-8; action="http://www.portalfiscal.inf.br/nfe/wsdl/NfceInutilizacao4/nfeDadosMsg"' },
+      headers: { "Content-Type": 'application/soap+xml; charset=UTF-8; action="http://www.portalfiscal.inf.br/nfe/wsdl/NFeInutilizacao4/nfeInutilizacaoNF"' },
       httpsAgent: agent,
       timeout: 30000,
     });

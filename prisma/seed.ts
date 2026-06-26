@@ -11,7 +11,7 @@ async function main() {
   console.log("Iniciando seed...");
 
   // Usuário administrador padrão
-  const adminEmail = "admin@xicopraia.com.br";
+  const adminEmail = "admin@boteco4075.com.br";
   const adminPassword = "Admin@123";
 
   const existing = await prisma.user.findUnique({ where: { email: adminEmail } });

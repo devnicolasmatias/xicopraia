@@ -10,7 +10,7 @@ const input: NfceInput = {
   config: {
     cnpj: "12.345.678/0001-90",
     razaoSocial: "BOTECO 4075 LTDA",
-    nomeFantasia: "Xico Praia",
+    nomeFantasia: "Boteco 4075",
     ie: "123456789",
     crt: 1,
     logradouro: "Rua das Flores",

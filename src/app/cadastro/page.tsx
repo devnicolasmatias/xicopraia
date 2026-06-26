@@ -55,7 +55,7 @@ export default function CadastroPage() {
             <Image src="/logo.png" alt="Logo" width={56} height={56} unoptimized />
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 text-center leading-tight">
-            Xico Praia
+            Boteco4075
           </h1>
           <p className="text-sm text-gray-500 mt-1 text-center">
             Cadastre-se e ganhe benefícios exclusivos 🎁
@@ -124,7 +124,7 @@ export default function CadastroPage() {
             </div>
 
             {error && (
-              <p className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                 {error}
               </p>
             )}

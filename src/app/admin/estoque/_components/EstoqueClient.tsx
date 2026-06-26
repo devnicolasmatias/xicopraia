@@ -108,7 +108,7 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
   function stockBadge(i: Ingredient) {
     const low = i.currentStock < i.minimumStock;
     const warn = i.minimumStock > 0 && i.currentStock < i.minimumStock * 1.2;
-    if (low) return "bg-orange-100 text-orange-600 border-orange-200";
+    if (low) return "bg-red-100 text-red-600 border-red-200";
     if (warn) return "bg-yellow-100 text-yellow-600 border-yellow-200";
     return "bg-green-100 text-green-600 border-green-200";
   }
@@ -127,7 +127,7 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg border
           ${toast.type === "error"
-            ? "bg-orange-50 border-orange-200 text-orange-600"
+            ? "bg-red-50 border-red-200 text-red-600"
             : "bg-green-50 border-green-200 text-green-700"}`}
         >
           {toast.type === "success" ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
@@ -141,13 +141,13 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
           <Link href="/admin" className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 shrink-0" aria-label="Voltar ao painel">
             <ArrowLeft size={18} />
           </Link>
-          <Image src="/logo.png" alt="Xico Praia" width={44} height={44} unoptimized className="shrink-0 hidden sm:block" />
+          <Image src="/logo.png" alt="Boteco4075" width={44} height={44} unoptimized className="shrink-0 hidden sm:block" />
           <div>
             <h1 className="text-xl font-bold text-gray-900">Estoque</h1>
             <p className="text-gray-500 text-sm mt-0.5">
               {ingredients.length} ingrediente(s)
               {lowStock.length > 0 && (
-                <span className="ml-2 text-orange-600 font-medium">· {lowStock.length} abaixo do mínimo</span>
+                <span className="ml-2 text-red-600 font-medium">· {lowStock.length} abaixo do mínimo</span>
               )}
             </p>
           </div>
@@ -174,7 +174,7 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg transition border-b-2 -mb-px
               ${tab === key
                 ? key === "reposicao" && lowStock.length > 0
-                  ? "border-orange-500 text-orange-600"
+                  ? "border-red-500 text-red-600"
                   : "border-orange-500 text-orange-600"
                 : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
@@ -216,12 +216,12 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
               )}
               {displayed.map((ing) => (
                 <tr key={ing.id} className={`border-t border-gray-100 transition
-                  ${ing.currentStock < ing.minimumStock ? "bg-orange-50/60 hover:bg-orange-50" : "hover:bg-gray-50"}`}
+                  ${ing.currentStock < ing.minimumStock ? "bg-red-50/60 hover:bg-red-50" : "hover:bg-gray-50"}`}
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">{ing.name}</td>
                   <td className="px-4 py-3 text-gray-500">{ing.unit}</td>
                   <td className="px-4 py-3">
-                    <span className={`font-semibold ${ing.currentStock < ing.minimumStock ? "text-orange-600" : "text-gray-900"}`}>
+                    <span className={`font-semibold ${ing.currentStock < ing.minimumStock ? "text-red-600" : "text-gray-900"}`}>
                       {ing.currentStock.toLocaleString("pt-BR")}
                     </span>
                   </td>
@@ -243,7 +243,7 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
                       <button
                         onClick={() => handleDelete(ing.id, ing.name)}
                         disabled={isPending}
-                        className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition"
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -270,7 +270,7 @@ export default function EstoqueClient({ ingredients: initial }: Props) {
             </div>
 
             {formError && (
-              <div className="mb-4 text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
+              <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
                 {formError}
               </div>
             )}

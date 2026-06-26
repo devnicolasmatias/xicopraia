@@ -6,10 +6,11 @@ import type { Role } from '@/generated/prisma';
 // Dicionário de Permissões: Fácil manutenção
 // Define as rotas base que cada Role pode acessar.
 const rolePermissions: Record<Role, string[]> = {
-  ADMIN: ['/admin', '/dashboard/mesas', '/dashboard/cozinha', '/pdv'], // Admin tem acesso irrestrito
+  ADMIN: ['/admin', '/dashboard/mesas', '/dashboard/cozinha', '/pdv'],
+  GERENTE: ['/admin', '/dashboard/cozinha'],
   GARCOM: ['/admin', '/dashboard/mesas'],
   COZINHA: ['/admin', '/dashboard/cozinha'],
-  CAIXA: ['/admin', '/pdv', '/dashboard/mesas'], // Opcionalmente liberei mapa de mesas pro caixa conforme plano
+  CAIXA: ['/admin', '/pdv', '/dashboard/mesas'],
 };
 
 export async function proxy(request: NextRequest) {
@@ -55,6 +56,7 @@ export async function proxy(request: NextRequest) {
   if (!hasPermission) {
     // Acesso Negado. Redireciona para a página principal daquela role.
     if (userRole === 'ADMIN') return NextResponse.redirect(new URL('/admin', request.url));
+    if (userRole === 'GERENTE') return NextResponse.redirect(new URL('/admin', request.url));
     if (userRole === 'GARCOM') return NextResponse.redirect(new URL('/dashboard/mesas', request.url));
     if (userRole === 'COZINHA') return NextResponse.redirect(new URL('/dashboard/cozinha', request.url));
     if (userRole === 'CAIXA') return NextResponse.redirect(new URL('/pdv', request.url));

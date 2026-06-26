@@ -26,6 +26,7 @@ export async function getTableOrders(tableId: string) {
     },
     orderBy: { createdAt: "asc" },
     include: {
+      user: { select: { name: true } },
       items: {
         orderBy: { createdAt: "asc" },
         include: {
@@ -63,7 +64,7 @@ export async function getProductsForPDV() {
 
 /** Confirma o pedido: salva no banco, atualiza status da mesa */
 export async function confirmOrder(tableId: string, items: CartItemInput[]) {
-  await requireAuth();
+  const session = await requireAuth();
 
   if (!items.length) return { error: "Carrinho vazio." };
 
@@ -74,6 +75,7 @@ export async function confirmOrder(tableId: string, items: CartItemInput[]) {
     const order = await tx.order.create({
       data: {
         tableId,
+        userId: session.userId,
         total,
         status: "ENVIADO",
         items: {
@@ -101,5 +103,43 @@ export async function confirmOrder(tableId: string, items: CartItemInput[]) {
 
   revalidatePath(`/dashboard/mesas/${tableId}`);
   revalidatePath("/dashboard/mesas");
+  return { success: true };
+}
+
+/** Remove (cancela) um item de pedido já lançado na mesa */
+export async function removeOrderItem(orderItemId: string) {
+  await requireAuth();
+
+  const item = await prisma.orderItem.findUnique({
+    where: { id: orderItemId },
+    include: { order: true },
+  });
+
+  if (!item) return { error: "Item não encontrado." };
+
+  await prisma.$transaction(async (tx) => {
+    await tx.orderItem.update({
+      where: { id: orderItemId },
+      data: { status: "CANCELADO" },
+    });
+
+    const remaining = await tx.orderItem.findMany({
+      where: { orderId: item.orderId, status: { not: "CANCELADO" } },
+    });
+
+    const newTotal = remaining.reduce(
+      (sum, i) => sum + Number(i.unitPrice) * i.quantity,
+      0,
+    );
+
+    await tx.order.update({
+      where: { id: item.orderId },
+      data: { total: newTotal },
+    });
+  });
+
+  revalidatePath(`/dashboard/mesas/${item.order.tableId}`);
+  revalidatePath("/dashboard/mesas");
+  revalidatePath("/dashboard/cozinha");
   return { success: true };
 }

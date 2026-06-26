@@ -51,7 +51,7 @@ export default function InutilizacaoPanel({ defaultSerie }: Props) {
     <div className="space-y-4">
       {result && (
         <div className={`flex items-start gap-2 px-4 py-3 rounded-xl text-sm border
-          ${result.ok ? "bg-green-50 border-green-200 text-green-700" : "bg-orange-50 border-orange-200 text-orange-600"}`}
+          ${result.ok ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-600"}`}
         >
           {result.ok ? <CheckCircle2 size={15} className="mt-0.5 shrink-0" /> : <AlertTriangle size={15} className="mt-0.5 shrink-0" />}
           <span>{result.msg}</span>

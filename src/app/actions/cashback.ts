@@ -151,7 +151,7 @@ async function sendCashbackWhatsApp(
   const expiryDate = expiresAt.toLocaleDateString("pt-BR");
 
   const text =
-    `🎉 Você ganhou *${formattedAmount}* de cashback no Xico Praia!\n\n` +
+    `🎉 Você ganhou *${formattedAmount}* de cashback no Boteco4075!\n\n` +
     `💰 Use na sua próxima visita como desconto.\n` +
     `⏳ Válido por ${expiryDays} dias (até ${expiryDate}).\n\n` +
     `Obrigado pela preferência! 🍽️`;

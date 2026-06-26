@@ -60,14 +60,15 @@ export function gerarChaveAcesso(params: {
   return chaveSemDV + cDV;
 }
 
-// ─── Hash QR Code: SHA-1(chave|tpAmb|cIdToken|CSC) ───────────────────────────
+// ─── Hash QR Code: SHA-1(chave|2|tpAmb|cIdToken + CSC) ──────────────────────
 
 export function gerarHashQRCode(chave: string, tpAmb: number, cIdToken: string, csc: string): string {
-  // NT2015.002 V2 §N6: hash usa cIdToken com 6 dígitos ("000001"), URL usa sem zeros
-  const cIdTokenPadded = cIdToken.trim().padStart(6, "0");
-  const cscClean = csc.trim().replace(/-/g, "");
-  const input = `${chave}|2|${tpAmb}|${cIdTokenPadded}|${cscClean}`;
-  return createHash("sha1").update(input).digest("hex").toUpperCase();
+  const cIdTokenNum = String(parseInt(cIdToken.trim(), 10));
+  const cscFinal = csc.trim();
+  const input = `${chave}|2|${tpAmb}|${cIdTokenNum}${cscFinal}`;
+  const hash = createHash("sha1").update(input).digest("hex").toUpperCase();
+  console.log("[QR Hash] cIdToken:", cIdTokenNum, "| csc len:", cscFinal.length, "| hash:", hash);
+  return hash;
 }
 
 // ─── URL do QR Code ───────────────────────────────────────────────────────────
@@ -103,7 +104,7 @@ export function getQRCodeBaseUrl(uf: string, tpAmb: number, urlCustom?: string |
     },
     // Estados SVRS: QR Code via portal da SEFAZ do próprio estado
     PB: {
-      hom:  "http://www.sefaz.pb.gov.br/nfce",
+      hom:  "http://www.sefaz.pb.gov.br/nfcehom",
       prod: "http://www.sefaz.pb.gov.br/nfce",
     },
     CE: {

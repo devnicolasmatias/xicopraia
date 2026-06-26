@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Xico Praia",
-  description: "Sistema de gestão Xico Praia",
+  title: "Boteco4075",
+  description: "Sistema de gestão Boteco4075",
 };
 
 export default function RootLayout({

@@ -17,7 +17,7 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <Image
               src="/logo.png"
-              alt="Xico Praia"
+              alt="Boteco4075"
               width={110}
               height={110}
               priority
@@ -33,7 +33,7 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           {/* Erro */}
           {state.error && (
-            <div className="bg-orange-50 border border-orange-200 text-orange-600 text-sm rounded-xl px-4 py-3 mb-4">
+            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
               {state.error}
             </div>
           )}

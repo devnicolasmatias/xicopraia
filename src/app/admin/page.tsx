@@ -39,7 +39,7 @@ export default async function AdminPage() {
       label: "Mapa de Mesas",
       desc: "Abrir, gerenciar e fechar mesas",
       badge: ocupadas > 0 ? `${ocupadas} ocupada${ocupadas > 1 ? "s" : ""}` : null,
-      badgeColor: "bg-orange-100 text-orange-600 border-orange-200",
+      badgeColor: "bg-red-100 text-red-600 border-red-200",
       color: "text-orange-500",
       iconBg: "bg-orange-50",
       roles: ["ADMIN", "GARCOM", "CAIXA"],
@@ -62,7 +62,7 @@ export default async function AdminPage() {
       desc: "Ingredientes e controle de insumos",
       badge: lowStock > 0 ? `${lowStock} para repor` : "OK",
       badgeColor: lowStock > 0
-        ? "bg-orange-100 text-orange-600 border-orange-200"
+        ? "bg-red-100 text-red-600 border-red-200"
         : "bg-green-100 text-green-600 border-green-200",
       color: "text-blue-600",
       iconBg: "bg-blue-50",
@@ -87,7 +87,7 @@ export default async function AdminPage() {
       badgeColor: "",
       color: "text-yellow-600",
       iconBg: "bg-yellow-50",
-      roles: ["ADMIN", "COZINHA"],
+      roles: ["ADMIN", "GERENTE", "COZINHA"],
     },
     {
       href: "/admin/fiscal",
@@ -111,7 +111,7 @@ export default async function AdminPage() {
       badgeColor: "bg-pink-100 text-pink-700 border-pink-200",
       color: "text-pink-600",
       iconBg: "bg-pink-50",
-      roles: ["ADMIN"],
+      roles: ["ADMIN", "GERENTE", "GARCOM"],
     },
     {
       href: "/pdv",
@@ -168,9 +168,9 @@ export default async function AdminPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 sm:px-10 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="Xico Praia" width={52} height={52} unoptimized />
+          <Image src="/logo.png" alt="Boteco4075" width={52} height={52} unoptimized />
           <div>
-            <h1 className="text-lg font-bold text-gray-900 leading-tight">Xico Praia</h1>
+            <h1 className="text-lg font-bold text-gray-900 leading-tight">Boteco4075</h1>
             <p className="text-gray-500 text-sm">
               Bem-vindo, <span className="text-orange-500 font-medium">{session.name}</span>
             </p>
@@ -193,10 +193,10 @@ export default async function AdminPage() {
             {/* Status rápido */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
-                { label: "Mesas ocupadas", value: ocupadas, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-100" },
+                { label: "Mesas ocupadas", value: ocupadas, color: "text-red-600", bg: "bg-red-50", border: "border-red-100" },
                 { label: "Mesas livres", value: livres, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
                 { label: "Produtos ativos", value: prodAtivos, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-100" },
-                { label: "Itens p/ repor", value: lowStock, color: lowStock > 0 ? "text-orange-600" : "text-gray-400", bg: lowStock > 0 ? "bg-orange-50" : "bg-gray-50", border: lowStock > 0 ? "border-orange-100" : "border-gray-200" },
+                { label: "Itens p/ repor", value: lowStock, color: lowStock > 0 ? "text-red-600" : "text-gray-400", bg: lowStock > 0 ? "bg-red-50" : "bg-gray-50", border: lowStock > 0 ? "border-red-100" : "border-gray-200" },
               ].map((s) => (
                 <div key={s.label} className={`${s.bg} border ${s.border} rounded-2xl px-4 py-3 shadow-sm`}>
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -207,7 +207,7 @@ export default async function AdminPage() {
 
             {/* Alertas */}
             {lowStock > 0 && (
-              <div className="mb-6 bg-orange-50 border border-orange-200 rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-orange-600">
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-red-600">
                 <AlertTriangle size={16} />
                 <span>{lowStock} ingrediente{lowStock > 1 ? "s" : ""} abaixo do estoque mínimo.</span>
                 <Link href="/admin/estoque?tab=reposicao" className="ml-auto flex items-center gap-1 text-xs hover:underline font-medium">
@@ -267,11 +267,11 @@ export default async function AdminPage() {
             { href: "/admin/estoque", label: "Ajustar Estoque", roles: ["ADMIN"] },
             { href: "/admin/estoque-diario", label: "Estoque Diário", roles: ["ADMIN", "GARCOM", "CAIXA", "COZINHA"] },
             { href: "/admin/fiscal", label: "Config. Fiscal", roles: ["ADMIN"] },
-            { href: "/admin/financeiro", label: "Financeiro", roles: ["ADMIN"] },
+            { href: "/admin/financeiro", label: "Financeiro", roles: ["ADMIN", "GERENTE", "GARCOM"] },
             { href: "/pdv", label: "PDV / Balcão", roles: ["ADMIN", "CAIXA"] },
             { href: "/admin/crm", label: "CRM", roles: ["ADMIN", "CAIXA"] },
             { href: "/admin/cashback", label: "Cashback Rápido", roles: ["ADMIN", "CAIXA"] },
-            { href: "/dashboard/cozinha", label: "Tela Cozinha", roles: ["ADMIN", "COZINHA"] },
+            { href: "/dashboard/cozinha", label: "Tela Cozinha", roles: ["ADMIN", "GERENTE", "COZINHA"] },
             { href: "/admin/usuarios", label: "Gerir Equipe", roles: ["ADMIN"] },
           ].filter(a => a.roles.includes(role)).map((a) => (
             <Link

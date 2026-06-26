@@ -22,6 +22,7 @@ interface Props {
 
 const ROLE_LABELS: Record<Role, string> = {
   ADMIN: "Administrador",
+  GERENTE: "Gerente",
   GARCOM: "Garçom",
   COZINHA: "Cozinha",
   CAIXA: "Caixa",
@@ -91,7 +92,7 @@ export default function UsersClient({ initialUsers }: Props) {
             <Link href="/admin" className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 shrink-0" aria-label="Voltar ao painel">
               <ArrowLeft size={18} />
             </Link>
-            <Image src="/logo.png" alt="Xico Praia" width={44} height={44} unoptimized className="shrink-0 hidden sm:block" />
+            <Image src="/logo.png" alt="Boteco4075" width={44} height={44} unoptimized className="shrink-0 hidden sm:block" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Equipe e Acessos</h1>
               <p className="text-sm text-gray-500 mt-1">Gerencie os funcionários, garçons e as permissões de cada um.</p>
@@ -146,7 +147,8 @@ export default function UsersClient({ initialUsers }: Props) {
                       <td className="px-6 py-4 text-gray-500">{user.email}</td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border
-                          ${user.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' : 
+                          ${user.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                            user.role === 'GERENTE' ? 'bg-pink-50 text-pink-700 border-pink-200' :
                             user.role === 'GARCOM' ? 'bg-orange-50 text-orange-700 border-orange-200' :
                             user.role === 'CAIXA' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                             'bg-yellow-50 text-yellow-700 border-yellow-200'
@@ -156,7 +158,7 @@ export default function UsersClient({ initialUsers }: Props) {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                         <span className={`inline-flex items-center gap-1.5 ${user.active ? 'text-green-600' : 'text-orange-500'}`}>
+                         <span className={`inline-flex items-center gap-1.5 ${user.active ? 'text-green-600' : 'text-red-500'}`}>
                            {user.active ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
                            {user.active ? 'Ativo' : 'Bloqueado'}
                          </span>
@@ -175,7 +177,7 @@ export default function UsersClient({ initialUsers }: Props) {
                              disabled={isPending}
                              className={`p-1.5 rounded-lg transition text-sm font-medium border
                                ${user.active 
-                                 ? 'text-orange-600 hover:bg-orange-50 border-transparent hover:border-orange-200' 
+                                 ? 'text-red-600 hover:bg-red-50 border-transparent hover:border-red-200' 
                                  : 'text-green-600 hover:bg-green-50 border-transparent hover:border-green-200'
                                }`}
                            >
@@ -207,7 +209,7 @@ export default function UsersClient({ initialUsers }: Props) {
             
             <form onSubmit={handleSubmit} className="p-6">
               {error && (
-                <div className="mb-4 p-3 bg-orange-50 text-orange-600 text-sm rounded-xl border border-orange-200">
+                <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-200">
                   {error}
                 </div>
               )}
@@ -242,6 +244,7 @@ export default function UsersClient({ initialUsers }: Props) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 transition bg-white"
                   >
                     <option value="ADMIN">Administrador (Acesso Total)</option>
+                    <option value="GERENTE">Gerente (Financeiro + Cozinha)</option>
                     <option value="GARCOM">Garçom (Acesso às Mesas)</option>
                     <option value="CAIXA">Caixa (Acesso ao PDV)</option>
                     <option value="COZINHA">Cozinha (Acesso ao Monitor KDS)</option>

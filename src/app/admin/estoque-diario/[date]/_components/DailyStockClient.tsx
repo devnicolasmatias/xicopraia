@@ -87,7 +87,7 @@ export default function DailyStockClient({ initialData, dateStr }: { initialData
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg border
-            ${toast.type === "error" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-green-50 border-green-200 text-green-700"}`}>
+            ${toast.type === "error" ? "bg-red-50 border-red-200 text-red-600" : "bg-green-50 border-green-200 text-green-700"}`}>
           <AlertCircle size={16} />
           {toast.msg}
         </div>
@@ -101,7 +101,7 @@ export default function DailyStockClient({ initialData, dateStr }: { initialData
               <ArrowLeft size={20} className="text-gray-500" />
             </button>
             <div className="hidden sm:flex items-center gap-2">
-              <Image src="/logo.png" alt="Xico Praia" width={36} height={36} unoptimized />
+              <Image src="/logo.png" alt="Boteco4075" width={36} height={36} unoptimized />
             </div>
             <div className="min-w-0">
               <h1 className="text-base md:text-xl font-bold text-gray-900 truncate">Contagem de Estoque</h1>

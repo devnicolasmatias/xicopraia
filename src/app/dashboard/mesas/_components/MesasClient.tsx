@@ -9,6 +9,8 @@ import { QRCodeSVG } from "qrcode.react";
 import MesaCard from "./MesaCard";
 import AbrirMesaModal from "./AbrirMesaModal";
 import { updateTableStatus } from "@/app/actions/tables";
+import { getTableOrdersForCheckout } from "@/app/actions/checkout";
+import { ImpressaoService } from "@/services/impressaoService";
 import type { TableStatus } from "@/generated/prisma";
 
 interface Table {
@@ -51,6 +53,10 @@ export default function MesasClient({ tables, userRole }: Props) {
       setOpenModal(table);
       return;
     }
+    if (table.status === "PEDIU_CONTA") {
+      router.push(`/dashboard/mesas/${table.id}/fechamento`);
+      return;
+    }
     setActionMenu(actionMenu === table.id ? null : table.id);
   }
 
@@ -59,6 +65,95 @@ export default function MesasClient({ tables, userRole }: Props) {
     startTransition(async () => {
       await updateTableStatus(id, status);
     });
+  }
+
+  async function imprimirConferencia(table: Table) {
+    const orders = await getTableOrdersForCheckout(table.id);
+    const allItems = orders.flatMap((o) =>
+      o.items.filter((i) => i.status !== "CANCELADO")
+    );
+    if (!allItems.length) return;
+
+    const waiterNames = [...new Set(
+      orders.map((o) => o.user?.name?.split(" ")[0]).filter(Boolean)
+    )];
+
+    const subtotal = allItems.reduce(
+      (s, i) => s + Number(i.unitPrice) * i.quantity,
+      0,
+    );
+
+    const serviceFeePercent = 10;
+    const serviceFee = subtotal * (serviceFeePercent / 100);
+    const totalConferencia = subtotal + serviceFee;
+
+    const fmtPrice = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
+    const COLS = 48;
+    const sep = `${"-".repeat(COLS)}\n`;
+    const padLine = (l: string, r: string) => {
+      const max = COLS - r.length - 1;
+      const lt = l.length > max ? l.slice(0, max - 1) + "." : l;
+      return lt + " ".repeat(COLS - lt.length - r.length) + r + "\n";
+    };
+
+    const cmds: string[] = [
+      "\x1B\x40",
+      "\x1B\x21\x10",
+      "\x1B\x61\x01",
+      "\x1B\x21\x30",
+      "CONFERENCIA DE CONTA\n",
+      "\x1B\x21\x10",
+      `Mesa ${table.number}${table.customerName ? ` - ${table.customerName}` : ""}\n`,
+      ...(waiterNames.length > 0 ? [`Garcom: ${waiterNames.join(", ")}\n`] : []),
+      `${new Date().toLocaleString("pt-BR")}\n`,
+      "\x1B\x61\x00",
+      sep,
+      ...allItems.map((item) =>
+        padLine(
+          `${item.quantity}x ${item.product.name}`,
+          fmtPrice(Number(item.unitPrice) * item.quantity),
+        ),
+      ),
+      sep,
+      padLine("Subtotal", fmtPrice(subtotal)),
+      padLine(`Taxa servico (${serviceFeePercent}%)`, fmtPrice(serviceFee)),
+      sep,
+      "\x1B\x21\x30",
+      padLine("TOTAL", fmtPrice(totalConferencia)),
+      "\x1B\x21\x10",
+      "\n",
+      "\x1B\x61\x01",
+      "Obrigado pela preferencia!\n",
+      "\x0A\x0A\x0A",
+      "\x1B\x6D",
+    ];
+
+    const enfileirar = async () => {
+      const res = await fetch("/api/print-queue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: btoa(cmds.join("")),
+          descricao: `Mesa ${table.number} - Conferencia`,
+        }),
+      });
+      if (!res.ok) throw new Error();
+    };
+
+    const nomeImpressora = localStorage.getItem("qz_impressora_padrao") ?? "";
+    try {
+      if (!nomeImpressora) {
+        await enfileirar();
+        return;
+      }
+      await ImpressaoService.imprimirRaw(nomeImpressora, cmds);
+    } catch {
+      try {
+        await enfileirar();
+      } catch {
+        console.error("[MesasClient] Falha ao imprimir conferencia.");
+      }
+    }
   }
 
   function goToDetail(id: string) {
@@ -82,7 +177,7 @@ export default function MesasClient({ tables, userRole }: Props) {
               <Link href="/admin" className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 shrink-0" aria-label="Voltar ao painel">
                 <ArrowLeft size={18} />
               </Link>
-              <Image src="/logo.png" alt="Xico Praia" width={36} height={36} unoptimized className="shrink-0 hidden sm:block" />
+              <Image src="/logo.png" alt="Boteco4075" width={36} height={36} unoptimized className="shrink-0 hidden sm:block" />
               <h1 className="text-lg font-bold text-gray-900">Mapa de Mesas</h1>
             </div>
             <div className="flex items-center gap-1">
@@ -161,7 +256,14 @@ export default function MesasClient({ tables, userRole }: Props) {
 
                   {table.status === "OCUPADA" && (
                     <button
-                      onClick={() => handleStatusChange(table.id, "PEDIU_CONTA")}
+                      onClick={() => {
+                        setActionMenu(null);
+                        startTransition(async () => {
+                          await updateTableStatus(table.id, "PEDIU_CONTA");
+                          imprimirConferencia(table);
+                          router.push(`/dashboard/mesas/${table.id}/fechamento`);
+                        });
+                      }}
                       disabled={isPending}
                       className="w-full px-3 py-2.5 text-sm text-left text-yellow-600 hover:bg-yellow-50 flex items-center gap-2"
                     >
@@ -190,7 +292,7 @@ export default function MesasClient({ tables, userRole }: Props) {
                   <button
                     onClick={() => handleStatusChange(table.id, "LIVRE")}
                     disabled={isPending}
-                    className="w-full px-3 py-2.5 text-sm text-left text-orange-600 hover:bg-orange-50 flex items-center gap-2 border-t border-gray-100"
+                    className="w-full px-3 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-100"
                   >
                     <LogOut size={14} /> Liberar mesa
                   </button>
@@ -213,7 +315,7 @@ export default function MesasClient({ tables, userRole }: Props) {
         <div className="flex flex-wrap gap-4 text-xs text-gray-500">
           {[
             { color: "bg-green-500",  label: "Livre" },
-            { color: "bg-orange-500",    label: "Ocupada" },
+            { color: "bg-red-500",    label: "Ocupada" },
             { color: "bg-yellow-500", label: "Pediu a conta" },
             { color: "bg-blue-500",   label: "Reservada" },
             { color: "bg-gray-400",   label: "Aguardando limpeza" },

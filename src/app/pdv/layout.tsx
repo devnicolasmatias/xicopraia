@@ -17,7 +17,7 @@ export default async function PdvLayout({
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
       <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-sm">
         <div className="flex items-center gap-3 min-w-0">
-          <Image src="/logo.png" alt="Xico Praia" width={40} height={40} className="shrink-0" />
+          <Image src="/logo.png" alt="Boteco4075" width={40} height={40} className="shrink-0" />
           <div className="min-w-0">
             <p className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Módulo</p>
             <h1 className="font-bold text-gray-900 leading-tight truncate">PDV — Ponto de venda</h1>
@@ -56,7 +56,7 @@ export default async function PdvLayout({
           <form action={logout}>
             <button
               type="submit"
-              className="text-sm font-medium text-orange-600 hover:bg-orange-50 border border-orange-200 rounded-xl px-3 py-1.5 transition"
+              className="text-sm font-medium text-red-600 hover:bg-red-50 border border-red-200 rounded-xl px-3 py-1.5 transition"
             >
               Sair
             </button>

@@ -111,7 +111,7 @@ export default async function CustomerDetailPage({
                           tx.type === "EARNED"
                             ? "bg-green-50 text-green-700 border-green-200"
                             : tx.type === "REDEEMED"
-                            ? "bg-orange-50 text-orange-600 border-orange-200"
+                            ? "bg-red-50 text-red-600 border-red-200"
                             : "bg-blue-50 text-blue-700 border-blue-200"
                         }`}
                       >

@@ -99,7 +99,7 @@ export default function CardapioClient({ categories, products, ingredients }: Pr
       {toast && (
         <div
           className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg border
-            ${toast.type === "error" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-green-50 border-green-200 text-green-700"}`}
+            ${toast.type === "error" ? "bg-red-50 border-red-200 text-red-600" : "bg-green-50 border-green-200 text-green-700"}`}
         >
           <AlertCircle size={16} />
           {toast.msg}
@@ -112,7 +112,7 @@ export default function CardapioClient({ categories, products, ingredients }: Pr
           <Link href="/admin" className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 shrink-0" aria-label="Voltar ao painel">
             <ArrowLeft size={18} />
           </Link>
-          <Image src="/logo.png" alt="Xico Praia" width={44} height={44} unoptimized className="shrink-0 hidden sm:block" />
+          <Image src="/logo.png" alt="Boteco4075" width={44} height={44} unoptimized className="shrink-0 hidden sm:block" />
           <div>
             <h1 className="text-xl font-bold text-gray-900">Cardápio</h1>
             <p className="text-gray-500 text-sm mt-0.5">
@@ -253,7 +253,7 @@ export default function CardapioClient({ categories, products, ingredients }: Pr
                         <button
                           onClick={() => handleDeleteProduct(p.id)}
                           disabled={isPending}
-                          className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition"
+                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -292,7 +292,7 @@ export default function CardapioClient({ categories, products, ingredients }: Pr
                   <button
                     onClick={() => handleDeleteCategory(cat.id)}
                     disabled={isPending}
-                    className="p-1.5 rounded-lg hover:bg-orange-50 text-gray-400 hover:text-orange-500 transition"
+                    className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition"
                   >
                     <Trash2 size={15} />
                   </button>

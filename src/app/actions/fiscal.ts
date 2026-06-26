@@ -14,6 +14,11 @@ async function requireAdmin() {
   if (!session || session.role !== "ADMIN") throw new Error("Acesso negado.");
 }
 
+async function requireAuth() {
+  const session = await getSession();
+  if (!session) throw new Error("Acesso negado.");
+}
+
 // ─── Fiscal Config ────────────────────────────────────────────────────────────
 
 export async function getFiscalConfig() {
@@ -82,7 +87,7 @@ export async function validateAndSaveCertificate(certBase64: string, password: s
 // ─── Emissão NFC-e ────────────────────────────────────────────────────────────
 
 export async function emitirNfceParaTransacao(transactionId: string) {
-  await requireAdmin();
+  await requireAuth();
 
   // Busca configuração fiscal
   const config = await prisma.fiscalConfig.findFirst();
@@ -250,30 +255,11 @@ export async function cancelarNfceDocument(nfceId: string, justificativa: string
   const cUF = UF_CODES[config.uf.toUpperCase()];
   if (!cUF) return { error: `UF inválida: ${config.uf}` };
 
-  const dhEvento = new Date().toISOString().slice(0, 19) + "-03:00";
+  const now = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  const dhEvento = now.toISOString().slice(0, 19) + "-03:00";
   const idEvento = `ID110111${nfce.chave}01`;
 
-  const xmlUnsigned = `<?xml version="1.0" encoding="UTF-8"?>
-<envEvento versao="1.00" xmlns="http://www.portalfiscal.inf.br/nfe">
-  <idLote>${Date.now()}</idLote>
-  <evento versao="1.00">
-    <infEvento Id="${idEvento}">
-      <cOrgao>${cUF}</cOrgao>
-      <tpAmb>${config.tpAmb}</tpAmb>
-      <CNPJ>${config.cnpj.replace(/\D/g, "")}</CNPJ>
-      <chNFe>${nfce.chave}</chNFe>
-      <dhEvento>${dhEvento}</dhEvento>
-      <tpEvento>110111</tpEvento>
-      <nSeqEvento>1</nSeqEvento>
-      <verEvento>1.00</verEvento>
-      <detEvento versao="1.00">
-        <descEvento>Cancelamento</descEvento>
-        <nProt>${nfce.protNFe}</nProt>
-        <xJust>${justificativa.trim()}</xJust>
-      </detEvento>
-    </infEvento>
-  </evento>
-</envEvento>`;
+  const xmlUnsigned = `<?xml version="1.0" encoding="UTF-8"?><envEvento versao="1.00" xmlns="http://www.portalfiscal.inf.br/nfe"><idLote>${Date.now()}</idLote><evento versao="1.00"><infEvento Id="${idEvento}"><cOrgao>${cUF}</cOrgao><tpAmb>${config.tpAmb}</tpAmb><CNPJ>${config.cnpj.replace(/\D/g, "")}</CNPJ><chNFe>${nfce.chave}</chNFe><dhEvento>${dhEvento}</dhEvento><tpEvento>110111</tpEvento><nSeqEvento>1</nSeqEvento><verEvento>1.00</verEvento><detEvento versao="1.00"><descEvento>Cancelamento</descEvento><nProt>${nfce.protNFe}</nProt><xJust>${justificativa.trim()}</xJust></detEvento></infEvento></evento></envEvento>`;
 
   try {
     const xmlSigned = signEventoXml(xmlUnsigned, cert.privateKeyPem, cert.certPem);
@@ -324,20 +310,7 @@ export async function inutilizarNumerosNfce(params: {
   const cnpj = config.cnpj.replace(/\D/g, "");
   const idInut = `ID${String(cUF).padStart(2,"0")}${anoStr}${cnpj}65${String(serieUse).padStart(3,"0")}${String(nNFIni).padStart(9,"0")}${String(nNFFin).padStart(9,"0")}`;
 
-  const xmlUnsigned = `<?xml version="1.0" encoding="UTF-8"?>
-<inutNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
-  <infInut Id="${idInut}">
-    <tpAmb>${config.tpAmb}</tpAmb>
-    <cUF>${cUF}</cUF>
-    <ano>${anoStr}</ano>
-    <CNPJ>${cnpj}</CNPJ>
-    <mod>65</mod>
-    <serie>${serieUse}</serie>
-    <nNFIni>${nNFIni}</nNFIni>
-    <nNFFin>${nNFFin}</nNFFin>
-    <xJust>${justificativa.trim()}</xJust>
-  </infInut>
-</inutNFe>`;
+  const xmlUnsigned = `<?xml version="1.0" encoding="UTF-8"?><inutNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe"><infInut Id="${idInut}"><tpAmb>${config.tpAmb}</tpAmb><cUF>${cUF}</cUF><ano>${anoStr}</ano><CNPJ>${cnpj}</CNPJ><mod>65</mod><serie>${serieUse}</serie><nNFIni>${nNFIni}</nNFIni><nNFFin>${nNFFin}</nNFFin><xJust>${justificativa.trim()}</xJust></infInut></inutNFe>`;
 
   try {
     const xmlSigned = signInutilizacaoXml(xmlUnsigned, cert.privateKeyPem, cert.certPem);

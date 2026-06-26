@@ -15,6 +15,7 @@ export default async function CozinhaPage() {
       ...i,
       unitPrice: parseFloat(String(i.unitPrice)),
       createdAt: new Date(i.createdAt),
+      updatedAt: new Date(i.updatedAt),
     })),
   }));
 

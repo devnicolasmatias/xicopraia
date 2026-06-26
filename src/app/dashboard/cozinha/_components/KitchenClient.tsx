@@ -18,6 +18,7 @@ interface KitchenItem {
   notes: string | null;
   status: OrderItemStatus;
   createdAt: Date;
+  updatedAt: Date;
   product: { id: string; name: string };
 }
 
@@ -97,8 +98,14 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
 
   const totalItems = orders.reduce((s, o) => s + o.items.reduce((si, i) => si + i.quantity, 0), 0);
   const urgentCount = orders.filter((o) => {
-    const mins = Math.floor((Date.now() - new Date(o.createdAt).getTime()) / 60000);
-    return mins >= 15;
+    const allPrepping = o.items.every((i) => i.status === "PREPARANDO");
+    if (allPrepping) {
+      const oldest = Math.min(...o.items.map((i) => new Date(i.updatedAt).getTime()));
+      return Math.floor((Date.now() - oldest) / 60000) >= 15;
+    }
+    const pendentes = o.items.filter((i) => i.status === "PENDENTE");
+    const oldest = Math.min(...pendentes.map((i) => new Date(i.createdAt).getTime()));
+    return Math.floor((Date.now() - oldest) / 60000) >= 5;
   }).length;
 
   return (
@@ -110,7 +117,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
           <Link href="/admin" className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 shrink-0" aria-label="Voltar ao painel">
             <ArrowLeft size={18} />
           </Link>
-          <Image src="/logo.png" alt="Xico Praia" width={36} height={36} unoptimized className="shrink-0 hidden sm:block" />
+          <Image src="/logo.png" alt="Boteco4075" width={36} height={36} unoptimized className="shrink-0 hidden sm:block" />
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-base leading-none text-gray-900">Cozinha — KDS</h1>
             <div className="flex items-center gap-3 mt-0.5">
@@ -118,7 +125,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
                 <Clock size={10} />
                 Atualiza em {countdown}s
               </span>
-              <span className={`text-xs flex items-center gap-1 ${isOnline ? "text-green-600" : "text-orange-500"}`}>
+              <span className={`text-xs flex items-center gap-1 ${isOnline ? "text-green-600" : "text-red-500"}`}>
                 {isOnline ? <Wifi size={10} /> : <WifiOff size={10} />}
                 {isOnline ? "Online" : "Offline"}
               </span>
@@ -134,7 +141,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
               {totalItems} item{totalItems !== 1 ? "s" : ""}
             </span>
             {urgentCount > 0 && (
-              <span className="text-xs bg-orange-100 border border-orange-200 text-orange-600 px-2.5 py-1 rounded-full font-medium">
+              <span className="text-xs bg-red-100 border border-red-200 text-red-600 px-2.5 py-1 rounded-full font-medium">
                 {urgentCount} urgente{urgentCount !== 1 ? "s" : ""}
               </span>
             )}
@@ -163,7 +170,7 @@ export default function KitchenClient({ initialOrders, refreshInterval = REFRESH
             {orders.length} pedidos · {totalItems} itens
           </span>
           {urgentCount > 0 && (
-            <span className="text-xs bg-orange-100 border border-orange-200 text-orange-600 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-red-100 border border-red-200 text-red-600 px-2 py-0.5 rounded-full">
               {urgentCount} urgente{urgentCount !== 1 ? "s" : ""}
             </span>
           )}

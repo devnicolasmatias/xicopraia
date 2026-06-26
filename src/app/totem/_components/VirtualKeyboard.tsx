@@ -40,7 +40,7 @@ export default function VirtualKeyboard({ value, onChange, onConfirm, mode = "te
         {NUM_ROWS.flat().map((key, i) => {
           if (key === "⌫") return (
             <button key={i} tabIndex={-1} onClick={del}
-              className="rounded-2xl bg-orange-600 text-white font-black active:scale-95 transition-transform"
+              className="rounded-2xl bg-red-600 text-white font-black active:scale-95 transition-transform"
               style={{ minHeight: "clamp(64px, 9vh, 120px)", fontSize: "clamp(1.5rem, 3vh, 2.5rem)" }}
             >⌫</button>
           );
@@ -85,7 +85,7 @@ export default function VirtualKeyboard({ value, onChange, onConfirm, mode = "te
 
           {ri === 2 && (
             <button tabIndex={-1} onClick={del}
-              className="rounded-xl bg-orange-600 text-white font-bold active:scale-95 transition-transform flex-none"
+              className="rounded-xl bg-red-600 text-white font-bold active:scale-95 transition-transform flex-none"
               style={{ minHeight: "clamp(48px, 6vh, 90px)", width: "clamp(52px, 7vw, 100px)", fontSize: "clamp(1rem, 2.5vh, 1.8rem)" }}
             >⌫</button>
           )}

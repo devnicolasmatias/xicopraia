@@ -73,19 +73,39 @@ export function buildNfceXml(input: NfceInput, chave: string, cNF: number): stri
   const vDesc = input.discount > 0 ? input.discount : 0;
   const vOutro = input.serviceFee > 0 ? input.serviceFee : 0;
 
+  // Distribui vOutro e vDesc proporcionalmente nos itens (SEFAZ valida soma item a item)
+  const itemVOutro: number[] = new Array(items.length).fill(0);
+  const itemVDesc: number[] = new Array(items.length).fill(0);
+  if (vOutro > 0 && vProdTotal > 0) {
+    let acum = 0;
+    for (let i = 0; i < items.length - 1; i++) {
+      itemVOutro[i] = parseFloat(fmt2(vOutro * items[i].vProd / vProdTotal));
+      acum += itemVOutro[i];
+    }
+    itemVOutro[items.length - 1] = parseFloat(fmt2(vOutro - acum));
+  }
+  if (vDesc > 0 && vProdTotal > 0) {
+    let acum = 0;
+    for (let i = 0; i < items.length - 1; i++) {
+      itemVDesc[i] = parseFloat(fmt2(vDesc * items[i].vProd / vProdTotal));
+      acum += itemVDesc[i];
+    }
+    itemVDesc[items.length - 1] = parseFloat(fmt2(vDesc - acum));
+  }
+
   // tPag
   const tPag = TPAG[input.paymentMethod] ?? "01";
 
-  // QR Code — formato V2: URL usa cIdToken sem zeros (XSD), hash usa 6 dígitos (NT2015.002 N6)
+  // QR Code — NT2015.002 §N6
   const qrBase = getQRCodeBaseUrl(config.uf, config.tpAmb, config.urlQrCode);
+  const cIdTokenNum = String(parseInt(config.cIdToken.trim(), 10));
   const hashQR  = gerarHashQRCode(chave, config.tpAmb, config.cIdToken, config.csc);
-  const cIdTokenInt = parseInt(config.cIdToken.trim(), 10);
-  const qrCodeUrl = `${qrBase}?p=${chave}|2|${config.tpAmb}|${cIdTokenInt}|${hashQR}`;
+  const qrCodeUrl = `${qrBase}?p=${chave}|2|${config.tpAmb}|${cIdTokenNum}|${hashQR}`;
 
   const xProdHom = "NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL";
 
   // ── Itens ──
-  const detXml = items.map((item) => `
+  const detXml = items.map((item, idx) => `
     <det nItem="${item.nItem}">
       <prod>
         <cProd>${item.cProd}</cProd>
@@ -101,6 +121,8 @@ export function buildNfceXml(input: NfceInput, chave: string, cNF: number): stri
         <uTrib>${item.uCom}</uTrib>
         <qTrib>${fmt4(item.qCom)}</qTrib>
         <vUnTrib>${fmt2(item.vUnCom)}</vUnTrib>
+        ${itemVDesc[idx] > 0 ? `<vDesc>${fmt2(itemVDesc[idx])}</vDesc>` : ""}
+        ${itemVOutro[idx] > 0 ? `<vOutro>${fmt2(itemVOutro[idx])}</vOutro>` : ""}
         <indTot>1</indTot>
       </prod>
       <imposto>
@@ -185,12 +207,13 @@ export function buildNfceXml(input: NfceInput, chave: string, cNF: number): stri
       <detPag>
         <tPag>${tPag}</tPag>
         <vPag>${fmt2(vNF)}</vPag>
+        ${(tPag === "03" || tPag === "04" || tPag === "17") ? `<card><tpIntegra>2</tpIntegra></card>` : ""}
       </detPag>
     </pag>
     ${config.tpAmb === 2 ? `<infAdic><infCpl>NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL</infCpl></infAdic>` : ""}
   </infNFe>
   <infNFeSupl>
-    <qrCode>${qrCodeUrl}</qrCode>
+    <qrCode><![CDATA[${qrCodeUrl}]]></qrCode>
     <urlChave>${qrBase}</urlChave>
   </infNFeSupl>
 </NFe>`;

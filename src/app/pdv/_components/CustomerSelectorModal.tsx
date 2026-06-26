@@ -191,7 +191,7 @@ export default function CustomerSelectorModal({ onSelect, onClose, mandatory = f
                     />
                   </div>
                   {newError && (
-                    <p className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
+                    <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
                       {newError}
                     </p>
                   )}
@@ -253,7 +253,7 @@ export default function CustomerSelectorModal({ onSelect, onClose, mandatory = f
                 />
               </div>
               {newError && (
-                <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
                   {newError}
                 </p>
               )}

@@ -7,7 +7,7 @@ import {
   ShoppingCart, ChefHat, CheckCircle2, Clock,
   Send, RefreshCw, Package, DollarSign,
 } from "lucide-react";
-import { confirmOrder, type CartItemInput } from "@/app/actions/orders";
+import { confirmOrder, removeOrderItem, type CartItemInput } from "@/app/actions/orders";
 import { ImpressaoService } from "@/services/impressaoService";
 import type { TableStatus, OrderItemStatus } from "@/generated/prisma";
 
@@ -44,6 +44,7 @@ interface OrderData {
   total: number;
   createdAt: Date;
   items: OrderItemData[];
+  userName: string | null;
 }
 
 interface TableData {
@@ -67,6 +68,7 @@ interface Props {
   products: Product[];
   categories: Category[];
   orders: OrderData[];
+  userName: string;
 }
 
 // ─── Status helpers ────────────────────────────────────────────────────────────
@@ -76,7 +78,7 @@ const ITEM_STATUS_CONFIG: Record<OrderItemStatus, { label: string; icon: React.R
   PREPARANDO: { label: "Preparando", icon: <ChefHat size={12} />,      color: "text-orange-600" },
   PRONTO:     { label: "Pronto",     icon: <CheckCircle2 size={12} />, color: "text-green-600"  },
   ENTREGUE:   { label: "Entregue",   icon: <CheckCircle2 size={12} />, color: "text-gray-400"   },
-  CANCELADO:  { label: "Cancelado",  icon: <Minus size={12} />,        color: "text-orange-500"    },
+  CANCELADO:  { label: "Cancelado",  icon: <Minus size={12} />,        color: "text-red-500"    },
 };
 
 const TABLE_STATUS_LABEL: Record<string, string> = {
@@ -90,7 +92,7 @@ interface Toast { id: number; msg: string; type: "success" | "error" }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 
-export default function MesaDetailClient({ table, products, categories, orders: initialOrders }: Props) {
+export default function MesaDetailClient({ table, products, categories, orders: initialOrders, userName }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -111,6 +113,29 @@ export default function MesaDetailClient({ table, products, categories, orders: 
 
   const [orders, setOrders] = useState<OrderData[]>(initialOrders);
   useEffect(() => setOrders(initialOrders), [initialOrders]);
+
+  const [removingItemId, setRemovingItemId] = useState<string | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+
+  function handleRemoveItem(itemId: string) {
+    if (confirmRemoveId === itemId) {
+      setConfirmRemoveId(null);
+      setRemovingItemId(itemId);
+      startTransition(async () => {
+        const res = await removeOrderItem(itemId);
+        setRemovingItemId(null);
+        if (res.error) {
+          addToast(res.error, "error");
+        } else {
+          addToast("Item removido!", "success");
+          router.refresh();
+        }
+      });
+    } else {
+      setConfirmRemoveId(itemId);
+      setTimeout(() => setConfirmRemoveId((cur) => cur === itemId ? null : cur), 3000);
+    }
+  }
 
   function addToCart(product: Product) {
     setCart((prev) => {
@@ -146,14 +171,16 @@ export default function MesaDetailClient({ table, products, categories, orders: 
   async function imprimirPedidoCozinha(itens: CartItem[]) {
     const COLS = 48;
     const sep = `${"-".repeat(COLS)}\n`;
+    const firstName = userName.split(" ")[0];
 
     const comandos: string[] = [
       "\x1B\x40",
       "\x1B\x61\x01",
       "\x1B\x21\x30",
       `MESA ${table.number}\n`,
-      "\x1B\x21\x00",
+      "\x1B\x21\x10",
       "PEDIDO COZINHA\n",
+      `Garcom: ${firstName}\n`,
       `${new Date().toLocaleString("pt-BR")}\n`,
       "\x1B\x61\x00",
       sep,
@@ -226,7 +253,8 @@ export default function MesaDetailClient({ table, products, categories, orders: 
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   const allLaunchedItems = orders.flatMap((o) => o.items);
-  const launchedTotal = allLaunchedItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  const activeLaunchedItems = allLaunchedItems.filter((i) => i.status !== "CANCELADO");
+  const launchedTotal = activeLaunchedItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
@@ -239,7 +267,7 @@ export default function MesaDetailClient({ table, products, categories, orders: 
             className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg
               ${t.type === "success"
                 ? "bg-green-50 border border-green-200 text-green-700"
-                : "bg-orange-50 border border-orange-200 text-orange-700"
+                : "bg-red-50 border border-red-200 text-red-700"
               }`}
           >
             {t.type === "success" ? <CheckCircle2 size={15} /> : null}
@@ -398,6 +426,9 @@ export default function MesaDetailClient({ table, products, categories, orders: 
               <div className="space-y-1 mb-3">
                 {allLaunchedItems.map((item) => {
                   const cfg = ITEM_STATUS_CONFIG[item.status];
+                  const isConfirming = confirmRemoveId === item.id;
+                  const isRemoving = removingItemId === item.id;
+                  if (item.status === "CANCELADO") return null;
                   return (
                     <div key={item.id} className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2">
                       <span className="text-gray-400 text-sm w-5 text-center">{item.quantity}×</span>
@@ -411,6 +442,18 @@ export default function MesaDetailClient({ table, products, categories, orders: 
                       <span className="text-xs text-gray-500 w-16 text-right">
                         {fmtPrice(item.unitPrice * item.quantity)}
                       </span>
+                      <button
+                        onClick={() => handleRemoveItem(item.id)}
+                        disabled={isRemoving}
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center transition shrink-0
+                          ${isConfirming
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : "hover:bg-red-50 text-gray-400 hover:text-red-500"
+                          } ${isRemoving ? "opacity-40 cursor-not-allowed" : ""}`}
+                        title={isConfirming ? "Clique novamente para confirmar" : "Remover item"}
+                      >
+                        {isRemoving ? <RefreshCw size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                      </button>
                     </div>
                   );
                 })}
@@ -460,7 +503,7 @@ export default function MesaDetailClient({ table, products, categories, orders: 
                       </button>
                       <button
                         onClick={() => removeFromCart(item.productId)}
-                        className="w-7 h-7 rounded-lg hover:bg-orange-50 flex items-center justify-center text-gray-400 hover:text-orange-500 transition ml-1"
+                        className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition ml-1"
                       >
                         <Trash2 size={12} />
                       </button>

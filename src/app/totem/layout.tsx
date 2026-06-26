@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Xico Praia — Autoatendimento",
+  title: "Boteco4075 — Autoatendimento",
   // Impede zoom em dispositivos touch (kiosk)
   other: {
     "viewport": "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
