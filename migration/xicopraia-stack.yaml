@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+  app:
+    image: xicopraia:latest
+    networks:
+      - SousaNet
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://xicopraia_user:25dd903ec2b67a06e3beaa8fd2150bf7@postgres_postgres:5432/xicopraia_db
+      - SESSION_SECRET=634c5b6939fdaba76e50472375cc5557772856459fbe4a34255820ea243f43d4
+      - QZ_PRIVATE_KEY=
+      - NEXT_PUBLIC_QZ_CERTIFICATE=
+      - EVOLUTION_API_URL=https://evolution.cielsousajunior.com.br
+      - EVOLUTION_API_KEY=ef8c9e043050f25368de0665fae86e80
+      - EVOLUTION_INSTANCE_NAME=xicopraia
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.xicopraia-app.rule=Host(`xicopraia.com.br`)"
+        - "traefik.http.routers.xicopraia-app.entrypoints=websecure"
+        - "traefik.http.routers.xicopraia-app.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.xicopraia-app.loadbalancer.server.port=3000"
+        - "traefik.docker.network=SousaNet"
+
+networks:
+  SousaNet:
+    external: true
+    name: SousaNet
